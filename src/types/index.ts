@@ -8,6 +8,8 @@ export interface IUserResponse {
 }
 
 export interface ILoginResponse {
-  token: string;
+  accessToken: string;
+  refreshToken: string;
   user: IUserResponse;
+  message: string;
 }

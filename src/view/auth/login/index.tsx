@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link, useLocation, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { Eye, EyeOff, Loader } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -15,30 +15,31 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useAtom } from "jotai";
-import { useAuthToken, useUserInfoStore } from "@/store/auth";
+import { useAuthAccessToken, useAuthRefreshToken } from "@/store/auth";
 import { Icons } from "@/assets";
 import type { ILoginResponse } from "@/types";
 import { formSchema, type TLoginPayload } from "../types/login";
 import { useLogin } from "../apis/use-login";
 import AuthLayout from "../layout";
+import { toast } from "react-toastify";
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = React.useState(false);
 
-  const [accessToken, setAccessToken] = useAtom(useAuthToken);
-  const [, setUserInfo] = useAtom(useUserInfoStore);
-  const location = useLocation();
+  const [accessToken, setAccessToken] = useAtom(useAuthAccessToken);
+  const [, setRefreshToken] = useAtom(useAuthRefreshToken);
   const navigate = useNavigate();
 
   const form = useForm<TLoginPayload>({
     resolver: zodResolver(formSchema),
   });
 
-  const backURL = new URLSearchParams(location.search).get("backUrl");
+  // const backURL = new URLSearchParams(location.search).get("backUrl");
 
   const onSuccess = (data: ILoginResponse) => {
-    setAccessToken(data.token);
-    setUserInfo(data.user);
+    setRefreshToken(data.refreshToken);
+    setAccessToken(data.accessToken);
+    toast(data.message);
   };
 
   const { mutate, isPending } = useLogin(onSuccess);
@@ -49,7 +50,7 @@ export function LoginForm() {
 
   useEffect(() => {
     if (accessToken) {
-      navigate({ to: backURL || "/" });
+      navigate({ to: "/" });
     }
   }, [accessToken]);
 

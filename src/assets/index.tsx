@@ -262,7 +262,7 @@ export const Icons = {
     >
       <path
         d="M10 5V15M15 10L5 10"
-        stroke="white"
+        stroke="currentColor"
         strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"

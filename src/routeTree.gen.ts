@@ -13,8 +13,10 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated/route'
 import { Route as authRouteImport } from './routes/(auth)/route'
 import { Route as AuthenticatedIndexImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedBoardImport } from './routes/_authenticated/board'
 import { Route as authRegisterImport } from './routes/(auth)/register'
 import { Route as authLoginImport } from './routes/(auth)/login'
 
@@ -28,15 +30,20 @@ const errors401LazyImport = createFileRoute('/(errors)/401')()
 
 // Create/Update Routes
 
+const AuthenticatedRouteRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const authRouteRoute = authRouteImport.update({
   id: '/(auth)',
   getParentRoute: () => rootRoute,
 } as any)
 
 const AuthenticatedIndexRoute = AuthenticatedIndexImport.update({
-  id: '/_authenticated/',
+  id: '/',
   path: '/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 
 const errors503LazyRoute = errors503LazyImport
@@ -79,6 +86,12 @@ const errors401LazyRoute = errors401LazyImport
   } as any)
   .lazy(() => import('./routes/(errors)/401.lazy').then((d) => d.Route))
 
+const AuthenticatedBoardRoute = AuthenticatedBoardImport.update({
+  id: '/board',
+  path: '/board',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+
 const authRegisterRoute = authRegisterImport.update({
   id: '/register',
   path: '/register',
@@ -102,6 +115,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authRouteImport
       parentRoute: typeof rootRoute
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRoute
+    }
     '/(auth)/login': {
       id: '/(auth)/login'
       path: '/login'
@@ -115,6 +135,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/register'
       preLoaderRoute: typeof authRegisterImport
       parentRoute: typeof authRouteImport
+    }
+    '/_authenticated/board': {
+      id: '/_authenticated/board'
+      path: '/board'
+      fullPath: '/board'
+      preLoaderRoute: typeof AuthenticatedBoardImport
+      parentRoute: typeof AuthenticatedRouteImport
     }
     '/(errors)/401': {
       id: '/(errors)/401'
@@ -156,7 +183,7 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedIndexImport
-      parentRoute: typeof rootRoute
+      parentRoute: typeof AuthenticatedRouteImport
     }
   }
 }
@@ -177,10 +204,25 @@ const authRouteRouteWithChildren = authRouteRoute._addFileChildren(
   authRouteRouteChildren,
 )
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedBoardRoute: typeof AuthenticatedBoardRoute
+  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedBoardRoute: AuthenticatedBoardRoute,
+  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
+  '': typeof AuthenticatedRouteRouteWithChildren
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
+  '/board': typeof AuthenticatedBoardRoute
   '/401': typeof errors401LazyRoute
   '/403': typeof errors403LazyRoute
   '/404': typeof errors404LazyRoute
@@ -192,6 +234,7 @@ export interface FileRoutesByTo {
   '/': typeof AuthenticatedIndexRoute
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
+  '/board': typeof AuthenticatedBoardRoute
   '/401': typeof errors401LazyRoute
   '/403': typeof errors403LazyRoute
   '/404': typeof errors404LazyRoute
@@ -202,8 +245,10 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/(auth)': typeof authRouteRouteWithChildren
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/(auth)/login': typeof authLoginRoute
   '/(auth)/register': typeof authRegisterRoute
+  '/_authenticated/board': typeof AuthenticatedBoardRoute
   '/(errors)/401': typeof errors401LazyRoute
   '/(errors)/403': typeof errors403LazyRoute
   '/(errors)/404': typeof errors404LazyRoute
@@ -216,20 +261,33 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | ''
     | '/login'
     | '/register'
+    | '/board'
     | '/401'
     | '/403'
     | '/404'
     | '/500'
     | '/503'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/register' | '/401' | '/403' | '/404' | '/500' | '/503'
+  to:
+    | '/'
+    | '/login'
+    | '/register'
+    | '/board'
+    | '/401'
+    | '/403'
+    | '/404'
+    | '/500'
+    | '/503'
   id:
     | '__root__'
     | '/(auth)'
+    | '/_authenticated'
     | '/(auth)/login'
     | '/(auth)/register'
+    | '/_authenticated/board'
     | '/(errors)/401'
     | '/(errors)/403'
     | '/(errors)/404'
@@ -241,22 +299,22 @@ export interface FileRouteTypes {
 
 export interface RootRouteChildren {
   authRouteRoute: typeof authRouteRouteWithChildren
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   errors401LazyRoute: typeof errors401LazyRoute
   errors403LazyRoute: typeof errors403LazyRoute
   errors404LazyRoute: typeof errors404LazyRoute
   errors500LazyRoute: typeof errors500LazyRoute
   errors503LazyRoute: typeof errors503LazyRoute
-  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   authRouteRoute: authRouteRouteWithChildren,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   errors401LazyRoute: errors401LazyRoute,
   errors403LazyRoute: errors403LazyRoute,
   errors404LazyRoute: errors404LazyRoute,
   errors500LazyRoute: errors500LazyRoute,
   errors503LazyRoute: errors503LazyRoute,
-  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -270,12 +328,12 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/(auth)",
+        "/_authenticated",
         "/(errors)/401",
         "/(errors)/403",
         "/(errors)/404",
         "/(errors)/500",
-        "/(errors)/503",
-        "/_authenticated/"
+        "/(errors)/503"
       ]
     },
     "/(auth)": {
@@ -285,6 +343,13 @@ export const routeTree = rootRoute
         "/(auth)/register"
       ]
     },
+    "/_authenticated": {
+      "filePath": "_authenticated/route.tsx",
+      "children": [
+        "/_authenticated/board",
+        "/_authenticated/"
+      ]
+    },
     "/(auth)/login": {
       "filePath": "(auth)/login.tsx",
       "parent": "/(auth)"
@@ -292,6 +357,10 @@ export const routeTree = rootRoute
     "/(auth)/register": {
       "filePath": "(auth)/register.tsx",
       "parent": "/(auth)"
+    },
+    "/_authenticated/board": {
+      "filePath": "_authenticated/board.tsx",
+      "parent": "/_authenticated"
     },
     "/(errors)/401": {
       "filePath": "(errors)/401.lazy.tsx"
@@ -309,7 +378,8 @@ export const routeTree = rootRoute
       "filePath": "(errors)/503.lazy.tsx"
     },
     "/_authenticated/": {
-      "filePath": "_authenticated/index.tsx"
+      "filePath": "_authenticated/index.tsx",
+      "parent": "/_authenticated"
     }
   }
 }

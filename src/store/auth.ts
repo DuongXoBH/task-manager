@@ -3,4 +3,5 @@ import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 
 export const useUserInfoStore = atom<IUserResponse>();
-export const useAuthToken = atomWithStorage("authToken", "");
+export const useAuthAccessToken = atomWithStorage("authToken", "");
+export const useAuthRefreshToken = atomWithStorage("refreshToken", "");
