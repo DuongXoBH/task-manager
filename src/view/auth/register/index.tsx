@@ -28,6 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { toast } from "react-toastify";
 
 export function RegisterForm() {
   const [showPassword, setShowPassword] = React.useState(false);
@@ -54,6 +55,7 @@ export function RegisterForm() {
     };
     mutate(data, {
       onSuccess: () => {
+        toast.success("Success");
         navigate({ to: backURL || "/login" });
       },
     });

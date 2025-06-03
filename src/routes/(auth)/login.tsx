@@ -1,4 +1,3 @@
-import { ThemeSwitch } from "@/components/theme-switch";
 import { LoginForm } from "@/view/auth/login";
 import { createFileRoute } from "@tanstack/react-router";
 
@@ -10,7 +9,6 @@ function RouteComponent() {
   return (
     <div>
       <LoginForm />
-      <ThemeSwitch />
     </div>
   );
 }

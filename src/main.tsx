@@ -43,7 +43,7 @@ if (!rootElement.innerHTML) {
         <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
           <JotaiProvider>
             <RouterProvider router={router} />
-            <ToastContainer autoClose={3000} />
+            <ToastContainer autoClose={3000} limit={1} />
           </JotaiProvider>
         </ThemeProvider>
       </QueryClientProvider>

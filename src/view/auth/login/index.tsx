@@ -74,7 +74,7 @@ export function LoginForm() {
                     <div
                       className={cn(
                         "relative flex h-[50px] w-full items-center rounded-xs",
-                        form.watch("email") ? "text-white" : "text-[#697698]"
+                        form.watch("email") ? "text-black" : "text-[#697698]"
                       )}
                     >
                       <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-5">
@@ -82,7 +82,7 @@ export function LoginForm() {
                       </div>
                       <Input
                         placeholder="Enter email address"
-                        className="h-[50px] pl-16 placeholder:text-[#697698]"
+                        className="h-[50px] pl-16 placeholder:text-[#697698] bg-white"
                         {...field}
                       />
                     </div>
@@ -107,7 +107,7 @@ export function LoginForm() {
                         className={cn(
                           "relative flex h-[50px] w-full items-center rounded-xs",
                           form.watch("password")
-                            ? "text-white"
+                            ? "text-black"
                             : "text-[#697698]"
                         )}
                       >
@@ -117,14 +117,14 @@ export function LoginForm() {
                         <Input
                           type={showPassword ? "text" : "password"}
                           placeholder="Enter password"
-                          className="h-[50px] pl-16 placeholder:text-[#697698]"
+                          className="h-[50px] pl-16 placeholder:text-[#697698] bg-white"
                           {...field}
                         />
                         <Button
                           type="button"
                           variant="default"
                           size="icon"
-                          className="absolute top-0 right-0 h-full !bg-inherit text-gray-400 hover:text-gray-600"
+                          className="absolute top-0 right-0 h-full !bg-inherit text-gray-400 hover:text-gray-600 border-white"
                           onClick={() => setShowPassword(!showPassword)}
                         >
                           {showPassword ? (
@@ -156,13 +156,12 @@ export function LoginForm() {
               Log In
             </Button>
 
-            {/*           
-          <div className='text-center text-sm font-medium'>
-            Don't have an account?{' '}
-            <Link to='/404' className='text-secondary hover:underline'>
-              Register →
-            </Link>
-          </div> */}
+            <div className="text-center text-sm font-medium">
+              Don't have an account?{" "}
+              <Link to="/register" className="text-secondary hover:underline">
+                Register →
+              </Link>
+            </div>
           </form>
         </Form>
       </div>

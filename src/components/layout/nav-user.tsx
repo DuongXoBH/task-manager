@@ -18,8 +18,11 @@ import {
 } from "@/components/ui/sidebar";
 import type { IUserResponse } from "@/types";
 import { useLogout } from "@/hooks/use-logout";
-
-export function NavUser({ user }: { user?: IUserResponse }) {
+interface INavUserProps {
+  user?: IUserResponse;
+  hasInfo?: boolean;
+}
+export function NavUser({ user, hasInfo }: INavUserProps) {
   const { isMobile } = useSidebar();
 
   return (
@@ -35,10 +38,12 @@ export function NavUser({ user }: { user?: IUserResponse }) {
                 <AvatarImage src={user?.avatar} alt={user?.name} />
                 <AvatarFallback className="rounded-lg">SN</AvatarFallback>
               </Avatar>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">{user?.name}</span>
-                <span className="truncate text-xs">{user?.email}</span>
-              </div>
+              {hasInfo && (
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-semibold">{user?.name}</span>
+                  <span className="truncate text-xs">{user?.email}</span>
+                </div>
+              )}
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>

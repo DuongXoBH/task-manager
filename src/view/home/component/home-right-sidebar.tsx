@@ -1,6 +1,6 @@
 import { Clock } from "lucide-react";
 import ListComponent from "./table-list";
-import CreateTable from "./new-table-dialog";
+import CreateProjectDialog from "@/view/project/component/create-projects";
 
 export default function HomeRightSidebar() {
   return (
@@ -10,7 +10,7 @@ export default function HomeRightSidebar() {
         <span className="w-full">Recently</span>
       </div>
       <ListComponent />
-      <CreateTable />
+      <CreateProjectDialog />
     </div>
   );
 }

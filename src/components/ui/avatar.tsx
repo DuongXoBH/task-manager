@@ -15,7 +15,7 @@ function Avatar({
       data-slot="avatar"
       className={cn(
         "relative flex size-8 shrink-0 overflow-hidden ",
-        isCircle && "rounded-full",
+        isCircle ? "rounded-full" : "rounded-xs",
         className
       )}
       {...props}

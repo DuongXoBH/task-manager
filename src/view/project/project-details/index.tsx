@@ -1,0 +1,27 @@
+import { useParams } from "@tanstack/react-router";
+import { useGetProjectById } from "../apis/project/use-get-project-by-id";
+import ProjectHeader from "./header";
+import DetailsMain from "./project-detail-main";
+import Header from "@/components/layout/header";
+
+export default function ProjectDetails() {
+  const { projectId } = useParams({
+    from: "/_authenticated/project/$projectId",
+  });
+  const { data: project, isLoading } = useGetProjectById(projectId);
+  if (isLoading) return;
+  return (
+    <div
+      className={`w-full flex flex-col items-center bg-no-repeat bg-cover max-h-screen`}
+      style={{
+        backgroundImage: `url(${project?.image})`,
+      }}
+    >
+      <div className="w-full bg-white flex justify-center items-center pt-3">
+        <Header />
+      </div>
+      <ProjectHeader project={project} />
+      <DetailsMain projectId={projectId} />
+    </div>
+  );
+}

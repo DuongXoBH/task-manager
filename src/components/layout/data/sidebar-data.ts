@@ -1,8 +1,9 @@
 import {
   AudioWaveform,
-  BookDashedIcon,
+  Book,
   Command,
   GalleryVerticalEnd,
+  Home,
   Table,
 } from "lucide-react";
 import type { SidebarData } from "../types";
@@ -30,14 +31,19 @@ export const sidebarData: SidebarData = {
       title: "General",
       items: [
         {
-          title: "Dashboard",
+          title: "Home",
           url: "/",
-          icon: BookDashedIcon,
+          icon: Home,
         },
         {
-          title: "Table",
-          url: "/board",
+          title: "Dashboard",
+          url: "/dashboard",
           icon: Table,
+        },
+        {
+          title: "Project",
+          url: "/project",
+          icon: Book,
         },
       ],
     },
