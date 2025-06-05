@@ -20,8 +20,8 @@ export interface ITaskResponse {
   dueDate?: Date;
   completed?: boolean;
   createdById: string;
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface ITaskStatusResponse {

@@ -5,7 +5,8 @@ import { useAtom } from "jotai";
 import { useAuthAccessToken, useUserInfoStore } from "@/store/auth";
 import type { ITaskStatusResponse } from "../../types";
 
-const getTaskStatus = async (projectId: string, token: string) => {
+const getTaskStatus = async (projectId: string | undefined, token: string) => {
+  if (!projectId) throw new Error("Missing projectId or token");
   const { data } = await api.get<ITaskStatusResponse[]>(
     `/task_status/by_projectId/${projectId}`,
     {
@@ -16,12 +17,12 @@ const getTaskStatus = async (projectId: string, token: string) => {
   );
   return data;
 };
-export const useGetTaskStatus = (projectId: string) => {
+export const useGetTaskStatus = (projectId: string | undefined) => {
   const [userInfo] = useAtom(useUserInfoStore);
   const [token] = useAtom(useAuthAccessToken);
-  const query = useQuery<ITaskStatusResponse[], AxiosError>({
+  const query = useQuery<ITaskStatusResponse[] | undefined, AxiosError>({
     queryKey: ["getTaskStatus", projectId],
-    queryFn: () => getTaskStatus(projectId ?? "", token),
+    queryFn: () => getTaskStatus(projectId, token),
     enabled: !!token && !!userInfo?._id,
   });
 

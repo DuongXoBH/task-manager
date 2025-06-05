@@ -110,7 +110,7 @@ export default function CreateProjectDialog() {
               <Button
                 variant={"secondary"}
                 disabled={isPending}
-                className="!bg-green-400 mt-2 h-[50px] w-full rounded-[5px] text-sm font-bold text-white hover:!bg-green-600"
+                className="!bg-blue-500 mt-2 h-[50px] w-full rounded-[5px] text-sm font-bold text-white hover:!bg-blue-600"
               >
                 {isPending && <Loader className="animate-spin" />}
                 Submit

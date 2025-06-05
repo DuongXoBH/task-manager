@@ -1,8 +1,8 @@
 import { useParams } from "@tanstack/react-router";
 import { useGetProjectById } from "../apis/project/use-get-project-by-id";
 import ProjectHeader from "./header";
-import DetailsMain from "./project-detail-main";
 import Header from "@/components/layout/header";
+import KanbanBoard from "./project-detail-main";
 
 export default function ProjectDetails() {
   const { projectId } = useParams({
@@ -21,7 +21,7 @@ export default function ProjectDetails() {
         <Header />
       </div>
       <ProjectHeader project={project} />
-      <DetailsMain projectId={projectId} />
+      <KanbanBoard projectId={projectId} />
     </div>
   );
 }

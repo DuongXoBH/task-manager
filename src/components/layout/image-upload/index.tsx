@@ -70,11 +70,6 @@ export default function ImageUpload({ defaultImage, setAvatar }: IImageUpload) {
 
     try {
       const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels);
-
-      // if (croppedImage.size > MAX_AVATAR_SIZE) {
-      //   croppedImage = await compressImage(croppedImage, MAX_AVATAR_SIZE);
-      // }
-
       const file = new File([croppedImage], "avatar.jpg", {
         type: croppedImage.type,
       });
@@ -114,7 +109,10 @@ export default function ImageUpload({ defaultImage, setAvatar }: IImageUpload) {
             className="w-[280px] cursor-pointer"
           />
         ) : (
-          <Button type="button" className=" text-black text-center font-medium">
+          <Button
+            type="button"
+            className=" text-black bg-gray-200 hover:bg-gray-400 text-center font-medium"
+          >
             Upload Images
           </Button>
         )}
@@ -148,7 +146,7 @@ export default function ImageUpload({ defaultImage, setAvatar }: IImageUpload) {
             <Button
               type="button"
               disabled={uploading}
-              className="bg-green-400 hover:bg-green-500 text-black"
+              className="bg-blue-400 hover:bg-blue-500 text-black"
               onClick={handleComplete}
             >
               {uploading && <Loader className="mr-2 size-4 animate-spin" />}

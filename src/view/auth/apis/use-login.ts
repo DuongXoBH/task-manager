@@ -13,8 +13,7 @@ export const useLogin = (onSuccess: (data: ILoginResponse) => void) =>
   useMutation({
     mutationFn: (payload: TLoginPayload) => login(payload),
     onSuccess,
-    onError: (error: Error) => {
-      const { message } = error;
-      toast.error(message);
+    onError: () => {
+      toast.error("Invalid email or password. Please try again .");
     },
   });

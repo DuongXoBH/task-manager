@@ -16,11 +16,11 @@ api.interceptors.response.use(
     const originalRequest = error.config;
     const toastId = "token-expired";
 
-    if (
-      error.response?.status === 401 &&
-      !originalRequest._retry &&
-      !originalRequest.url.includes("/auth/refresh")
-    ) {
+    if (originalRequest.url?.includes("/user/login")) {
+      return Promise.reject(error);
+    }
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {

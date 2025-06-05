@@ -129,7 +129,11 @@ export default function AddMemberDialog({
         })}
         <DialogFooter>
           <DialogClose asChild>
-            <Button type="button" variant="outline">
+            <Button
+              type="button"
+              variant="outline"
+              className="bg-gray-400 hover:bg-gray-500"
+            >
               Cancel
             </Button>
           </DialogClose>
@@ -141,7 +145,7 @@ export default function AddMemberDialog({
                 memberIds: memberList,
               })
             }
-            className="!bg-green-400"
+            className="bg-blue-500 hover:bg-blue-600"
           >
             {updateProjectMutate.isPending ? (
               <>

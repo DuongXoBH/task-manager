@@ -32,6 +32,7 @@ export default function TinyEditorComponent({
         height: 250,
         menubar: false,
         statusbar: false,
+        suffix: ".min",
         placeholder: placeholder || "Write something...",
         base_url: "/tinymce",
         plugins: [
@@ -51,7 +52,7 @@ export default function TinyEditorComponent({
           "wordcount",
         ],
         toolbar:
-          "undo redo | formatselect | bold italic forecolor backcolor | " +
+          "undo redo | formatselect | bold italic underline| " +
           "alignleft aligncenter alignright alignjustify | " +
           "bullist numlist outdent indent | removeformat | help",
       }}

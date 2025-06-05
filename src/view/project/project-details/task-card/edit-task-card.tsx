@@ -15,7 +15,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useUpdateTask } from "../../apis/task/use-update-task";
 import { Input } from "@/components/ui/input";
-import { AlignJustify, CalendarIcon, Loader } from "lucide-react";
+import { AlignJustify, CalendarIcon, Clock, Loader } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Tooltip,
@@ -31,22 +31,23 @@ import {
 } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { useEffect, useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { Label } from "@/components/ui/label";
 import TinyEditorComponent from "./description-field";
+import { useAtom } from "jotai";
+import { useTaskListStore } from "@/store/project";
+import { useUserInfoStore } from "@/store/auth";
 interface IEditTaskProps {
   task: ITaskResponse;
   setIsOpen: (status: boolean) => void;
 }
 export default function EditTask({ task, setIsOpen }: IEditTaskProps) {
-  const queryClient = useQueryClient();
   const updateTaskMutate = useUpdateTask();
-
+  const [auth] = useAtom(useUserInfoStore);
+  const [, setColumns] = useAtom(useTaskListStore);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(
-    task.dueDate
+    task.dueDate ? new Date(task.dueDate) : undefined
   );
-
   const [description, setDescription] = useState(task.description ?? "");
   const [isEdit, setIsEdit] = useState(false);
 
@@ -61,16 +62,36 @@ export default function EditTask({ task, setIsOpen }: IEditTaskProps) {
   });
 
   const onSubmit = (val: TUpdateTaskForm) => {
+    const updateTask: ITaskResponse = {
+      _id: task._id,
+      statusId: task.statusId,
+      projectId: task.projectId,
+      createdById: auth?._id ?? "",
+      title: val.title ?? task.title,
+      description: val.description,
+      dueDate: val.dueDate ? new Date(val.dueDate) : task.dueDate,
+      completed: val.completed,
+      createdAt: task.createdAt,
+      updatedAt: Date.now().toString(),
+    };
+    setColumns((prev) =>
+      prev?.map((column) => {
+        if (column.id !== task.statusId) return column;
+
+        return {
+          ...column,
+          tasks: column.tasks.map((item) =>
+            item._id === task._id ? updateTask : item
+          ),
+        };
+      })
+    );
     updateTaskMutate.mutate(
       { taskId: task._id, payload: val },
       {
         onSuccess: () => {
-          queryClient.invalidateQueries({
-            queryKey: ["getTaskByStatusId"],
-          });
-          setIsOpen(false);
-          setIsEdit(false);
           toast.success("Success");
+          setIsOpen(false);
         },
       }
     );
@@ -81,10 +102,7 @@ export default function EditTask({ task, setIsOpen }: IEditTaskProps) {
   }, [description]);
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="w-full max-w-md space-y-4"
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-4">
         <div className="w-full flex flex-row justify-between items-center gap-2">
           <FormField
             control={form.control}
@@ -138,49 +156,75 @@ export default function EditTask({ task, setIsOpen }: IEditTaskProps) {
             )}
           />
         </div>
-        <FormField
-          control={form.control}
-          name="dueDate"
-          render={() => (
-            <FormItem className="w-full ml-8">
-              <FormControl>
-                <div className="w-full grid space-y-1">
-                  <Label>Due date</Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "w-[calc(100%-32px)] justify-start text-left font-normal",
-                          !selectedDate && "text-muted-foreground"
-                        )}
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {selectedDate ? (
-                          format(selectedDate, "PPP")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={selectedDate}
-                        onSelect={(date) => {
-                          setSelectedDate(date);
-                          form.setValue("dueDate", date ?? undefined);
-                        }}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="w-full flex flex-row gap-8">
+          <Clock size={20} color="gray" />
+          <div className="w-full grid-cols-1 space-y-5">
+            <div className="w-full grid space-y-1">
+              <Label>Start date</Label>
+              <div className="w-full rounded-sm border border-gray-200 p-2 flex items-center gap-3">
+                <CalendarIcon className="h-4 w-4" />
+                <span className="text-sm">{format(task.createdAt, "PPP")}</span>
+              </div>
+            </div>
+            <FormField
+              control={form.control}
+              name="dueDate"
+              render={() => (
+                <FormItem className="w-full">
+                  <FormControl>
+                    <div className="w-full grid space-y-1">
+                      <Label>Due date</Label>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "w-full justify-start text-left font-normal",
+                              !selectedDate && "text-muted-foreground"
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {selectedDate ? (
+                              format(selectedDate, "PPP")
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={selectedDate}
+                            onSelect={(date) => {
+                              if (!date) return;
+                              const createdAtDate = new Date(task.createdAt);
+                              const isInvalid =
+                                date.setHours(0, 0, 0, 0) <
+                                createdAtDate.setHours(0, 0, 0, 0);
+                              if (isInvalid) {
+                                form.setError("dueDate", {
+                                  type: "manual",
+                                  message:
+                                    "Due date must be after the last created date.",
+                                });
+                              } else {
+                                form.clearErrors("dueDate");
+                                setSelectedDate(date);
+                                form.setValue("dueDate", date);
+                              }
+                            }}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </div>
         <FormField
           control={form.control}
           name="description"
