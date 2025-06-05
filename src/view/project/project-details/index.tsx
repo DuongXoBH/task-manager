@@ -1,6 +1,6 @@
 import { useParams } from "@tanstack/react-router";
 import { useGetProjectById } from "../apis/project/use-get-project-by-id";
-import ProjectHeader from "./header";
+import ProjectHeader from "./project-header/header";
 import Header from "@/components/layout/header";
 import KanbanBoard from "./project-detail-main";
 
@@ -17,7 +17,7 @@ export default function ProjectDetails() {
         backgroundImage: `url(${project?.image})`,
       }}
     >
-      <div className="w-full bg-white flex justify-center items-center pt-3">
+      <div className="w-full bg-white flex justify-center items-center opacity-90">
         <Header />
       </div>
       <ProjectHeader project={project} />

@@ -1,12 +1,14 @@
-import type { IProjectResponse } from "../types";
+import type { IProjectResponse } from "../../types";
 import UserProfilePopover from "./profile-popover";
 import AddMemberDialog from "./add-member-dialog";
+import FilterTask from "./filter-task";
 interface IProjectHeaderProps {
   project: IProjectResponse | undefined;
 }
 export default function ProjectHeader({ project }: IProjectHeaderProps) {
+  if (!project) return;
   return (
-    <div className="w-full h-[50px] px-3 flex justify-between items-center bg-gray-100">
+    <div className="w-full h-[50px] px-3 flex justify-between items-center bg-white opacity-80">
       <span className="text-[#172B4D] text-lg font-semibold">
         {project?.name}
       </span>
@@ -22,10 +24,8 @@ export default function ProjectHeader({ project }: IProjectHeaderProps) {
             );
           })}
         </div>
-        <AddMemberDialog
-          projectMembersIds={project?.memberIds ?? []}
-          projectId={project?._id ?? ""}
-        />
+        <FilterTask />
+        <AddMemberDialog project={project} />
       </div>
     </div>
   );

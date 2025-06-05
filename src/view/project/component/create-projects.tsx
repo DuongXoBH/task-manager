@@ -102,9 +102,12 @@ export default function CreateProjectDialog() {
                   </FormItem>
                 )}
               />
+              {/* Upload Image */}
               <ImageUpload
                 setAvatar={(images: string) => form.setValue("images", images)}
               />
+
+              {/* Add Member to Project */}
               <AddMemberToProject />
 
               <Button

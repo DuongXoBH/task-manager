@@ -21,24 +21,27 @@ import {
 } from "@/components/ui/dialog";
 import { Loader, Plus, UserPlus, X } from "lucide-react";
 import { useMemo, useState } from "react";
-import { useUpdateProject } from "../apis/project/use-update-project";
+import { useUpdateProject } from "../../apis/project/use-update-project";
 import { toast } from "react-toastify";
 import { useQueryClient } from "@tanstack/react-query";
+import type { IProjectResponse } from "../../types";
+import { useAtom } from "jotai";
+import { useUserInfoStore } from "@/store/auth";
 
 export default function AddMemberDialog({
-  projectMembersIds,
-  projectId,
+  project,
 }: {
-  projectMembersIds: string[];
-  projectId: string;
+  project: IProjectResponse;
 }) {
-  const [memberList, setMemberList] = useState<string[]>(projectMembersIds);
+  const [auth] = useAtom(useUserInfoStore);
+  const isAuth = auth?._id === project.createdById;
+  const [memberList, setMemberList] = useState<string[]>(project.memberIds);
   const { data: users } = useGetUsers();
   const queryClient = useQueryClient();
   const updateProjectMutate = useUpdateProject(() => {
     toast.success("Success");
     queryClient.invalidateQueries({
-      queryKey: ["getProjectById", projectId],
+      queryKey: ["getProjectById", project._id],
     });
   });
   const filterUsers = useMemo(() => {
@@ -56,7 +59,9 @@ export default function AddMemberDialog({
         <DialogHeader>
           <DialogTitle className="flex flex-row space-x-1">
             <Plus className="h-5 w-5 text-gray-500" />
-            <span className="font-medium text-gray-900">Add New Member</span>
+            <span className="font-medium text-gray-900">
+              Add New Member To Project
+            </span>
           </DialogTitle>
           <DialogDescription></DialogDescription>
         </DialogHeader>
@@ -113,16 +118,18 @@ export default function AddMemberDialog({
                     <span className="truncate text-xs">{user?.email}</span>
                   </div>
                 </div>
-                <Button
-                  onClick={() =>
-                    setMemberList((prev) =>
-                      prev.filter((item) => item != user._id)
-                    )
-                  }
-                  className="!px-1.5 !border-0 text-gray-500 !bg-inherit hover:!bg-gray-300"
-                >
-                  <X />
-                </Button>
+                {isAuth && user._id != project.createdById && (
+                  <Button
+                    onClick={() =>
+                      setMemberList((prev) =>
+                        prev.filter((item) => item != user._id)
+                      )
+                    }
+                    className="!px-1.5 !border-0 text-gray-500 !bg-inherit hover:!bg-gray-300"
+                  >
+                    <X />
+                  </Button>
+                )}
               </div>
             )
           );
@@ -141,7 +148,7 @@ export default function AddMemberDialog({
             type="button"
             onClick={() =>
               updateProjectMutate.mutate({
-                projectId,
+                projectId: project._id,
                 memberIds: memberList,
               })
             }

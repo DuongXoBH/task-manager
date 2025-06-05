@@ -114,7 +114,7 @@ export default function EditTask({ task, setIsOpen }: IEditTaskProps) {
                     <TooltipTrigger asChild>
                       <Checkbox
                         className={cn(
-                          "!text-gray-500 rounded-full",
+                          "rounded-full border-gray-400",
                           form.watch("completed") && "!bg-green-800"
                         )}
                         checked={form.watch("completed")}
@@ -156,8 +156,8 @@ export default function EditTask({ task, setIsOpen }: IEditTaskProps) {
             )}
           />
         </div>
-        <div className="w-full flex flex-row gap-8">
-          <Clock size={20} color="gray" />
+        <div className="w-full flex flex-row gap-2">
+          <Clock size={20} className="text-gray-500" />
           <div className="w-full grid-cols-1 space-y-5">
             <div className="w-full grid space-y-1">
               <Label>Start date</Label>
@@ -252,8 +252,9 @@ export default function EditTask({ task, setIsOpen }: IEditTaskProps) {
                     />
                   ) : (
                     <div
+                      onClick={() => setIsEdit(true)}
                       dangerouslySetInnerHTML={{ __html: description }}
-                      className="w-full pl-8"
+                      className="w-full pl-8 cursor-pointer"
                     ></div>
                   )}
                 </div>
@@ -266,7 +267,7 @@ export default function EditTask({ task, setIsOpen }: IEditTaskProps) {
         <Button
           variant="secondary"
           disabled={updateTaskMutate.isPending}
-          className="!bg-green-400 mt-2 h-[50px] w-full rounded-[5px] text-sm font-bold text-white hover:!bg-green-600"
+          className="!bg-blue-500 mt-2 h-[50px] w-full rounded-[5px] text-sm font-bold text-white hover:!bg-blue-600"
         >
           {updateTaskMutate.isPending && (
             <Loader className="mr-2 animate-spin" />

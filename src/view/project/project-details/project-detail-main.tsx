@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from "react";
-import { Plus, MoreHorizontal, X, Copy } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { useAtom } from "jotai";
 import { useTaskListStore, type IColumn } from "@/store/project";
 import { useGetTaskByProjectId } from "../apis/task/use-get-task-by-project-id";
@@ -14,9 +14,6 @@ import { useUpdateTask } from "../apis/task/use-update-task";
 import { TaskCard } from "./task-card";
 import { useCreateNewTaskStatus } from "../apis/task-status/use-create-task-status";
 
-// Simple drag and drop implementation without external libraries
-// This provides the core functionality similar to react-dnd
-
 interface IDragItem {
   type: string;
   id: string;
@@ -26,7 +23,6 @@ interface IDragItem {
 export default function KanbanBoard({ projectId }: { projectId: string }) {
   const [auth] = useAtom(useUserInfoStore);
   const [columns, setColumns] = useAtom(useTaskListStore);
-
   const [newTask, setNewTask] = useState<{ [key: string]: string }>({});
   const [isAddingTask, setIsAddingTask] = useState<{ [key: string]: boolean }>(
     {}
@@ -34,7 +30,7 @@ export default function KanbanBoard({ projectId }: { projectId: string }) {
   const [draggedItem, setDraggedItem] = useState<IDragItem | null>(null);
   const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
   const [newColumn, setNewColumn] = useState<IColumn & { order: number }>();
-  const [isAddingColummn, setIsAddingColumn] = useState(false);
+  const [isAddingColumn, setIsAddingColumn] = useState(false);
 
   const { data: taskList } = useGetTaskByProjectId(projectId);
   const { data: statusList } = useGetTaskStatus(projectId);
@@ -45,6 +41,12 @@ export default function KanbanBoard({ projectId }: { projectId: string }) {
   const addTask = (columnId: string) => {
     const taskContent = newTask[columnId]?.trim();
     if (!taskContent) return;
+
+    const column = columns?.find((item) => item.id === columnId);
+    const isDuplicate = column?.tasks.some(
+      (task) => task.title === taskContent
+    );
+    if (isDuplicate) return;
 
     const newTaskObj: ITaskResponse = {
       _id: Date.now().toString(),
@@ -63,6 +65,7 @@ export default function KanbanBoard({ projectId }: { projectId: string }) {
           : column
       );
     });
+
     const taskPayload: TCreateTaskPayload = {
       title: newTaskObj.title,
       statusId: newTaskObj.statusId,
@@ -208,7 +211,7 @@ export default function KanbanBoard({ projectId }: { projectId: string }) {
   }, [taskList, statusList]);
 
   return (
-    <div className="flex flex-row gap-6 mt-5 w-full">
+    <div className="flex flex-row gap-6 mt-5 w-full pl-3">
       {columns?.map((column) => (
         <div key={column.id}>
           <div
@@ -222,13 +225,10 @@ export default function KanbanBoard({ projectId }: { projectId: string }) {
             onDrop={(e) => handleDrop(e, column.id)}
           >
             {/* Column Header */}
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-4 max-h-[calc(100vh-400px)] overflow-y-auto">
               <h2 className="text-lg font-semibold text-gray-800">
                 {column.title} ({column.tasks.length})
               </h2>
-              <Button className=" bg-white p-1 hover:bg-gray-100 rounded-lg transition-colors">
-                <MoreHorizontal className="w-5 h-5 text-gray-500" />
-              </Button>
             </div>
 
             {/* Tasks */}
@@ -245,7 +245,7 @@ export default function KanbanBoard({ projectId }: { projectId: string }) {
                     draggable
                     onDragStart={(e) => handleDragStart(e, task._id, column.id)}
                     onDragEnd={handleDragEnd}
-                    className="bg-blue-50 border-2 border-blue-200 rounded-lg p-3 group hover:border-blue-300 transition-all cursor-pointer hover:shadow-md active:shadow-lg"
+                    className="bg-blue-100 border-2 border-blue-300 rounded-lg p-3 group hover:border-blue-400 transition-all cursor-pointer hover:shadow-md active:shadow-lg"
                   >
                     <TaskCard task={task} columnId={column.id} />
                   </div>
@@ -261,7 +261,7 @@ export default function KanbanBoard({ projectId }: { projectId: string }) {
                 )}
 
               {/* Add Task Input */}
-              {isAddingTask[column.id] && (
+              {isAddingTask[column.id] ? (
                 <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-3">
                   <Input
                     type="text"
@@ -270,7 +270,7 @@ export default function KanbanBoard({ projectId }: { projectId: string }) {
                       setNewTask({ ...newTask, [column.id]: e.target.value })
                     }
                     onKeyDown={(e) => handleKeyPress(e, column.id)}
-                    placeholder="type your title"
+                    placeholder="Type your task title"
                     className="w-full bg-transparent border-none outline-none text-gray-700 text-sm placeholder-gray-400"
                     autoFocus
                   />
@@ -289,24 +289,22 @@ export default function KanbanBoard({ projectId }: { projectId: string }) {
                     </Button>
                   </div>
                 </div>
+              ) : (
+                <Button
+                  onClick={() => startAddingTask(column.id)}
+                  className="w-full mt-4 flex items-center gap-2 p-3 bg-inherit hover:bg-gray-400 rounded-lg transition-colors group shadow-none"
+                >
+                  <Plus className="w-4 h-4" color="black" />
+                  <span className="text-sm font-medium text-black">
+                    Add task
+                  </span>
+                </Button>
               )}
             </div>
-
-            {/* Add Task Button */}
-            {!isAddingTask[column.id] && (
-              <Button
-                onClick={() => startAddingTask(column.id)}
-                className="w-full mt-4 flex items-center gap-2 p-3 text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors group"
-              >
-                <Plus className="w-4 h-4" />
-                <span className="text-sm font-medium">Add task</span>
-                <Copy className="w-4 h-4 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
-              </Button>
-            )}
           </div>
         </div>
       ))}
-      {isAddingColummn && (
+      {isAddingColumn ? (
         <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg w-[272px] h-[136px]">
           <Input
             type="text"
@@ -374,8 +372,7 @@ export default function KanbanBoard({ projectId }: { projectId: string }) {
             </Button>
           </div>
         </div>
-      )}
-      {!isAddingColummn && (
+      ) : (
         <Button
           onClick={() => setIsAddingColumn(true)}
           className="flex items-center gap-2 p-3 text-gray-600 !bg-gray-50 hover:!bg-gray-300 rounded-lg transition-colors group w-[272px]"

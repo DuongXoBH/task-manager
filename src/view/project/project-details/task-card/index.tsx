@@ -78,15 +78,15 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, columnId }) => {
                 e.stopPropagation();
                 removeTask(columnId, task._id);
               }}
-              className="opacity-0 group-hover:opacity-100 !px-2 bg-inherit hover:bg-red-100 rounded transition-all ml-2"
+              className="opacity-0 group-hover:opacity-100 !px-2 bg-inherit hover:bg-gray-400 rounded transition-all ml-2"
             >
-              <X className="w-4 h-4 text-red-500" />
+              <X className="w-4 h-4 text-gray-800" />
             </Button>
           </div>
         </DialogTrigger>
         <DialogContent
           showCloseButton={false}
-          className="max-h-[548px] !top-[150px] left-1/2 -translate-x-1/2 !translate-y-0"
+          className="max-h-[548px] !top-[150px] left-1/2 -translate-x-1/2 !translate-y-0 overflow-y-auto"
         >
           <DialogHeader>
             <DialogTitle></DialogTitle>
