@@ -26,7 +26,7 @@ function HomeComponent() {
           "has-[main.fixed-main]:group-data-[scroll-locked=1]/body:h-svh"
         )}
       >
-        <div className="w-full flex flex-col">
+        <div className="w-full flex flex-col pt-2">
           <Search />
           <div className="w-full pt-[9px]">
             <HomePage />

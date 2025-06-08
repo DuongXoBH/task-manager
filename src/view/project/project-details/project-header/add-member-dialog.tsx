@@ -1,4 +1,3 @@
-import { useGetUsers } from "@/apis/use-get-users";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,7 +25,7 @@ import { toast } from "react-toastify";
 import { useQueryClient } from "@tanstack/react-query";
 import type { IProjectResponse } from "../../types";
 import { useAtom } from "jotai";
-import { useUserInfoStore } from "@/store/auth";
+import { useUserInfoStore, useUserList } from "@/store/auth";
 
 export default function AddMemberDialog({
   project,
@@ -36,7 +35,7 @@ export default function AddMemberDialog({
   const [auth] = useAtom(useUserInfoStore);
   const isAuth = auth?._id === project.createdById;
   const [memberList, setMemberList] = useState<string[]>(project.memberIds);
-  const { data: users } = useGetUsers();
+  const [users] = useAtom(useUserList);
   const queryClient = useQueryClient();
   const updateProjectMutate = useUpdateProject(() => {
     toast.success("Success");
@@ -50,7 +49,10 @@ export default function AddMemberDialog({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button type="button" className="!bg-gray-600 hover:!bg-gray-800">
+        <Button
+          type="button"
+          className="!bg-gray-600 hover:!bg-gray-800 dark:text-white"
+        >
           <UserPlus />
           Add member
         </Button>

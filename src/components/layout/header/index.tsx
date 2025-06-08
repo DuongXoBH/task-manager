@@ -3,7 +3,6 @@ import Search from "../search";
 import { useUserInfoStore } from "@/store/auth";
 import { useAtom } from "jotai";
 import { HeadUser } from "./head-user";
-import { ThemeSwitch } from "@/components/theme-switch";
 
 export default function Header() {
   const [userInfo] = useAtom(useUserInfoStore);
@@ -13,10 +12,7 @@ export default function Header() {
         <img src="/vite.svg" alt="" className="size-10" />
       </Link>
       <Search />
-      <div className="flex flex-row items-center gap-2">
-        <ThemeSwitch />
-        <HeadUser user={userInfo} />
-      </div>
+      <HeadUser user={userInfo} />
     </div>
   );
 }

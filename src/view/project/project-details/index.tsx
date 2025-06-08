@@ -20,8 +20,12 @@ export default function ProjectDetails() {
       <div className="w-full bg-white flex justify-center items-center opacity-90">
         <Header />
       </div>
-      <ProjectHeader project={project} />
-      <KanbanBoard projectId={projectId} />
+      <div className="w-full flex flex-row">
+        <div className="size-full flex flex-col">
+          <ProjectHeader project={project} />
+          <KanbanBoard projectId={projectId} />
+        </div>
+      </div>
     </div>
   );
 }

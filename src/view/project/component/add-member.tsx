@@ -1,9 +1,8 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Search, Plus, X, User, Check } from "lucide-react";
 import type { IUserResponse } from "@/types";
-import { useGetUsers } from "@/apis/use-get-users";
 import { useAtom } from "jotai";
-import { useUserInfoStore } from "@/store/auth";
+import { useUserInfoStore, useUserList } from "@/store/auth";
 import { useFormContext } from "react-hook-form";
 import type { TCreateProjectForm } from "../types/create-project";
 import { Input } from "@/components/ui/input";
@@ -18,7 +17,7 @@ interface IProjectMember extends IUserResponse {
 
 // Mock user data - replace with your actual user data
 const AddMemberToProject: React.FC = () => {
-  const { data: users } = useGetUsers();
+  const [users] = useAtom(useUserList);
   const { setValue } = useFormContext<TCreateProjectForm>();
   const [userInfo] = useAtom(useUserInfoStore);
   const [searchQuery, setSearchQuery] = useState("");

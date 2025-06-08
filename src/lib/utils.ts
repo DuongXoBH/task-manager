@@ -89,3 +89,39 @@ export function stripHtmlTags(html: string): string {
   const doc = new DOMParser().parseFromString(html, "text/html");
   return doc.body.textContent || "";
 }
+export const isOverdue = (date: Date | undefined): boolean => {
+  if (!date) return false;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return date < today;
+};
+
+export const isExpiresTomorrow = (date: Date | undefined): boolean => {
+  if (!date) return false;
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  tomorrow.setHours(0, 0, 0, 0);
+  const nextDay = new Date(tomorrow);
+  nextDay.setDate(nextDay.getDate() + 1);
+  return date >= tomorrow && date < nextDay;
+};
+
+export const isExpiresNextWeek = (date: Date | undefined): boolean => {
+  if (!date) return false;
+  const today = new Date();
+  const nextWeek = new Date();
+  nextWeek.setDate(today.getDate() + 7);
+  const weekAfter = new Date();
+  weekAfter.setDate(today.getDate() + 14);
+  return date >= nextWeek && date < weekAfter;
+};
+
+export const isExpiresNextMonth = (date: Date | undefined): boolean => {
+  if (!date) return false;
+  const today = new Date();
+  const nextMonth = new Date();
+  nextMonth.setMonth(today.getMonth() + 1);
+  const monthAfter = new Date();
+  monthAfter.setMonth(today.getMonth() + 2);
+  return date >= nextMonth && date < monthAfter;
+};

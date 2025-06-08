@@ -54,7 +54,9 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, columnId }) => {
                     <Check color="white" />
                   </div>
                 )}
-                <p className="flex text-base leading-relaxed">{task?.title}</p>
+                <p className="flex text-base leading-relaxed max-w-[156px] overflow-x-auto">
+                  {task?.title}
+                </p>
               </div>
               {task?.dueDate && (
                 <div

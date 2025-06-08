@@ -117,7 +117,7 @@ export default function EditTask({ task, setIsOpen }: IEditTaskProps) {
                           "rounded-full border-gray-400",
                           form.watch("completed") && "!bg-green-800"
                         )}
-                        checked={form.watch("completed")}
+                        checked={form.watch("completed") ?? false}
                         onCheckedChange={(check) => {
                           const isChecked =
                             check === "indeterminate" ? false : check;

@@ -28,6 +28,7 @@ export default function TinyEditorComponent({
 }) {
   return (
     <Editor
+      licenseKey="gpl"
       init={{
         height: 250,
         menubar: false,

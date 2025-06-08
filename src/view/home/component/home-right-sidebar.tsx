@@ -4,7 +4,7 @@ import CreateProjectDialog from "@/view/project/component/create-projects";
 
 export default function HomeRightSidebar() {
   return (
-    <div className="w-full max-w-0 lg:max-w-[240px] min-h-10 flex flex-col">
+    <div className="w-full max-w-[240px] hidden lg:flex min-h-10 flex-col">
       <div className="w-full flex flex-row text-xs text-gray-400 gap-2 items-center mx-4">
         <Clock />
         <span className="w-full">Recently</span>

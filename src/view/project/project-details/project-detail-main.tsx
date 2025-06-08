@@ -1,7 +1,7 @@
-import React, { useState, useCallback, useEffect } from "react";
-import { Plus, X } from "lucide-react";
+import React, { useState, useEffect, useCallback } from "react";
+import { Loader, Plus, X } from "lucide-react";
 import { useAtom } from "jotai";
-import { useTaskListStore, type IColumn } from "@/store/project";
+import { useFilterTask, useTaskListStore, type IColumn } from "@/store/project";
 import { useGetTaskByProjectId } from "../apis/task/use-get-task-by-project-id";
 import { useGetTaskStatus } from "../apis/task-status/use-get-task-status";
 import type { ITaskResponse } from "../types";
@@ -13,6 +13,13 @@ import type { TCreateTaskPayload } from "../types/create-task";
 import { useUpdateTask } from "../apis/task/use-update-task";
 import { TaskCard } from "./task-card";
 import { useCreateNewTaskStatus } from "../apis/task-status/use-create-task-status";
+import { toast } from "react-toastify";
+import {
+  isExpiresNextMonth,
+  isExpiresNextWeek,
+  isExpiresTomorrow,
+  isOverdue,
+} from "@/lib/utils";
 
 interface IDragItem {
   type: string;
@@ -22,6 +29,7 @@ interface IDragItem {
 
 export default function KanbanBoard({ projectId }: { projectId: string }) {
   const [auth] = useAtom(useUserInfoStore);
+  const [filter] = useAtom(useFilterTask);
   const [columns, setColumns] = useAtom(useTaskListStore);
   const [newTask, setNewTask] = useState<{ [key: string]: string }>({});
   const [isAddingTask, setIsAddingTask] = useState<{ [key: string]: boolean }>(
@@ -32,8 +40,10 @@ export default function KanbanBoard({ projectId }: { projectId: string }) {
   const [newColumn, setNewColumn] = useState<IColumn & { order: number }>();
   const [isAddingColumn, setIsAddingColumn] = useState(false);
 
-  const { data: taskList } = useGetTaskByProjectId(projectId);
-  const { data: statusList } = useGetTaskStatus(projectId);
+  const { data: taskList, isLoading: isTaskLoading } =
+    useGetTaskByProjectId(projectId);
+  const { data: statusList, isLoading: isColumnLoading } =
+    useGetTaskStatus(projectId);
   const createTaskMutate = useCreateNewTask();
   const updateTaskMutate = useUpdateTask();
   const createTaskStatusMutate = useCreateNewTaskStatus();
@@ -44,9 +54,12 @@ export default function KanbanBoard({ projectId }: { projectId: string }) {
 
     const column = columns?.find((item) => item.id === columnId);
     const isDuplicate = column?.tasks.some(
-      (task) => task.title === taskContent
+      (task) => task.title.toLowerCase() === taskContent.toLowerCase()
     );
-    if (isDuplicate) return;
+    if (isDuplicate) {
+      toast.error("This task title already exists.");
+      return;
+    }
 
     const newTaskObj: ITaskResponse = {
       _id: Date.now().toString(),
@@ -86,7 +99,12 @@ export default function KanbanBoard({ projectId }: { projectId: string }) {
               ...column,
               tasks: column.tasks.map((task) =>
                 task.title === val.title && task.createdById === val.createdById
-                  ? { ...task, _id: val._id }
+                  ? {
+                      ...task,
+                      _id: val._id,
+                      createdAt: val.createdAt,
+                      updatedAt: val.updatedAt,
+                    }
                   : task
               ),
             };
@@ -98,36 +116,85 @@ export default function KanbanBoard({ projectId }: { projectId: string }) {
     setIsAddingTask({ ...isAddingTask, [columnId]: false });
   };
 
-  const moveTask = useCallback(
-    (taskId: string, fromColumnId: string, toColumnId: string) => {
-      if (fromColumnId === toColumnId) return;
+  const addColumn = () => {
+    if (!newColumn?.title) return;
+    const isDuplicate = columns?.some(
+      (column) => column.title.toLowerCase() === newColumn.title.toLowerCase()
+    );
 
-      setColumns((prev) => {
-        if (!prev) return prev;
+    if (isDuplicate) {
+      toast.error("The column already exists");
+      return;
+    }
 
-        const newColumns = [...prev];
-        const fromColumn = newColumns.find((col) => col.id === fromColumnId);
-        const toColumn = newColumns.find((col) => col.id === toColumnId);
+    setColumns((prev) => {
+      return prev ? [...prev, newColumn] : [];
+    });
 
-        if (!fromColumn || !toColumn) return prev;
+    createTaskStatusMutate.mutate(
+      {
+        title: newColumn?.title ?? "",
+        order: newColumn?.order ?? 0,
+        projectId,
+      },
+      {
+        onSuccess: (val) => {
+          setColumns((prev) =>
+            prev?.map((column) => {
+              if (column.id !== "new-column") return column;
 
-        const taskToMove = fromColumn.tasks.find(
-          (task: ITaskResponse) => task._id === taskId
-        );
-        if (!taskToMove) return prev;
+              return {
+                ...column,
+                id: val._id,
+              };
+            })
+          );
+        },
+        onError: () => {
+          setColumns((prev) =>
+            prev?.filter((column) => {
+              return column.id !== "new-column";
+            })
+          );
+        },
+      }
+    );
+    setNewColumn(undefined);
+    setIsAddingColumn(false);
+  };
 
-        fromColumn.tasks = fromColumn.tasks.filter(
-          (task) => task._id !== taskId
-        );
+  const moveTask = (
+    taskId: string,
+    fromColumnId: string,
+    toColumnId: string
+  ) => {
+    if (fromColumnId === toColumnId) return;
 
-        toColumn.tasks = [...toColumn.tasks, taskToMove];
+    setColumns((prev) => {
+      if (!prev) return prev;
 
-        return newColumns;
-      });
-      updateTaskMutate.mutate({ taskId, payload: { statusId: toColumnId } });
-    },
-    []
-  );
+      const newColumns = [...prev];
+      const fromColumn = newColumns.find((col) => col.id === fromColumnId);
+      const toColumn = newColumns.find((col) => col.id === toColumnId);
+
+      if (!fromColumn || !toColumn) return prev;
+
+      const taskToMove = fromColumn.tasks.find(
+        (task: ITaskResponse) => task._id === taskId
+      );
+      if (!taskToMove) return prev;
+
+      fromColumn.tasks = fromColumn.tasks.filter((task) => task._id !== taskId);
+
+      toColumn.tasks = [
+        ...toColumn.tasks,
+        { ...taskToMove, statusId: toColumnId },
+      ];
+
+      return newColumns;
+    });
+    updateTaskMutate.mutate({ taskId, payload: { statusId: toColumnId } });
+  };
 
   const handleDragStart = (
     e: React.DragEvent,
@@ -190,13 +257,69 @@ export default function KanbanBoard({ projectId }: { projectId: string }) {
     setNewTask({ ...newTask, [columnId]: "" });
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent, columnId: string) => {
+  const startAddingColumn = () => {
+    setIsAddingColumn(true);
+  };
+
+  const cancelAddingColumn = () => {
+    setIsAddingColumn(false);
+    setNewColumn(undefined);
+  };
+
+  const handleKeyPressAtTask = (e: React.KeyboardEvent, columnId: string) => {
     if (e.key === "Enter") {
       addTask(columnId);
     } else if (e.key === "Escape") {
       cancelAddingTask(columnId);
     }
   };
+
+  const handleKeyPressAtColumn = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      addColumn();
+    } else if (e.key === "Escape") {
+      cancelAddingColumn();
+    }
+  };
+
+  const getFilteredTasks = useCallback(
+    (tasks: ITaskResponse[]): ITaskResponse[] => {
+      const noStatusFilter =
+        !filter.cardStatus.completed && !filter.cardStatus.notCompleted;
+
+      const noDateFilter =
+        !filter.expirationDate.noExpiration &&
+        !filter.expirationDate.overdue &&
+        !filter.expirationDate.expiresTomorrow &&
+        !filter.expirationDate.expiresNextWeek &&
+        !filter.expirationDate.expiresNextMonth;
+
+      if (noStatusFilter && noDateFilter) {
+        return tasks;
+      }
+
+      return tasks.filter((task) => {
+        const statusMatch = noStatusFilter
+          ? true
+          : (filter.cardStatus.completed && task.completed) ||
+            (filter.cardStatus.notCompleted && !task.completed);
+
+        const dateMatch = noDateFilter
+          ? true
+          : (filter.expirationDate.noExpiration && !task.dueDate) ||
+            (filter.expirationDate.overdue && isOverdue(task.dueDate)) ||
+            (filter.expirationDate.expiresTomorrow &&
+              isExpiresTomorrow(task.dueDate)) ||
+            (filter.expirationDate.expiresNextWeek &&
+              isExpiresNextWeek(task.dueDate)) ||
+            (filter.expirationDate.expiresNextMonth &&
+              isExpiresNextMonth(task.dueDate));
+
+        return statusMatch && dateMatch;
+      });
+    },
+    [filter]
+  );
 
   useEffect(() => {
     if (!taskList || !statusList) return;
@@ -209,13 +332,20 @@ export default function KanbanBoard({ projectId }: { projectId: string }) {
       }))
     );
   }, [taskList, statusList]);
+  if (isTaskLoading || isColumnLoading)
+    return (
+      <div className="flex w-full h-[calc(100vh-106px)] flex-col items-center justify-center bg-white">
+        <Loader className="size-30 animate-spin" />
+        Loading
+      </div>
+    );
 
   return (
-    <div className="flex flex-row gap-6 mt-5 w-full pl-3">
+    <div className="flex flex-row gap-6 mt-5 w-full px-3 max-w-screen overflow-x-auto min-h-[calc(100vh-128px)]">
       {columns?.map((column) => (
         <div key={column.id}>
           <div
-            className={`w-[272px] bg-white/90 backdrop-blur-sm rounded-lg p-6 shadow-lg transition-all duration-200 ${
+            className={`w-[272px] max-h-[calc(100vh-142px)] overflow-y-auto bg-white/90 backdrop-blur-sm rounded-lg p-6 shadow-lg transition-all duration-200 ${
               dragOverColumn === column.id
                 ? "ring-2 ring-blue-400 bg-blue-50/90"
                 : ""
@@ -227,13 +357,13 @@ export default function KanbanBoard({ projectId }: { projectId: string }) {
             {/* Column Header */}
             <div className="flex items-center justify-between mb-4 max-h-[calc(100vh-400px)] overflow-y-auto">
               <h2 className="text-lg font-semibold text-gray-800">
-                {column.title} ({column.tasks.length})
+                {column.title} ({getFilteredTasks(column.tasks).length})
               </h2>
             </div>
 
             {/* Tasks */}
             <div className="space-y-3">
-              {column.tasks
+              {getFilteredTasks(column.tasks)
                 .sort(
                   (a, b) =>
                     new Date(a.createdAt).getTime() -
@@ -269,7 +399,7 @@ export default function KanbanBoard({ projectId }: { projectId: string }) {
                     onChange={(e) =>
                       setNewTask({ ...newTask, [column.id]: e.target.value })
                     }
-                    onKeyDown={(e) => handleKeyPress(e, column.id)}
+                    onKeyDown={(e) => handleKeyPressAtTask(e, column.id)}
                     placeholder="Type your task title"
                     className="w-full bg-transparent border-none outline-none text-gray-700 text-sm placeholder-gray-400"
                     autoFocus
@@ -292,7 +422,7 @@ export default function KanbanBoard({ projectId }: { projectId: string }) {
               ) : (
                 <Button
                   onClick={() => startAddingTask(column.id)}
-                  className="w-full mt-4 flex items-center gap-2 p-3 bg-inherit hover:bg-gray-400 rounded-lg transition-colors group shadow-none"
+                  className="w-full mt-4 flex items-center justify-start gap-2 p-3 bg-inherit hover:bg-gray-400 rounded-lg transition-colors group shadow-none"
                 >
                   <Plus className="w-4 h-4" color="black" />
                   <span className="text-sm font-medium text-black">
@@ -316,6 +446,7 @@ export default function KanbanBoard({ projectId }: { projectId: string }) {
                 order: columns?.length ?? 0,
               })
             }
+            onKeyDown={handleKeyPressAtColumn}
             placeholder="Fill your status's title"
             className="w-full bg-transparent border-none outline-none text-gray-700 text-sm placeholder-gray-400"
             autoFocus
@@ -323,49 +454,14 @@ export default function KanbanBoard({ projectId }: { projectId: string }) {
           <div className="flex items-center justify-between gap-2 mt-3">
             <Button
               type="button"
-              onClick={() => {
-                if (newColumn)
-                  setColumns((prev) => {
-                    return prev ? [...prev, newColumn] : [];
-                  });
-                setNewColumn(undefined);
-                setIsAddingColumn(false);
-                createTaskStatusMutate.mutate(
-                  {
-                    title: newColumn?.title ?? "",
-                    order: newColumn?.order ?? 0,
-                    projectId,
-                  },
-                  {
-                    onSuccess: (val) => {
-                      setColumns((prev) =>
-                        prev?.map((column) => {
-                          if (column.id !== "new-column") return column;
-
-                          return {
-                            ...column,
-                            id: val._id,
-                          };
-                        })
-                      );
-                    },
-                    onError: () => {
-                      setColumns((prev) =>
-                        prev?.filter((column) => {
-                          return column.id !== "new-column";
-                        })
-                      );
-                    },
-                  }
-                );
-              }}
+              onClick={() => addColumn()}
               className="!bg-blue-500 hover:!bg-blue-600 text-white px-3 py-1.5 rounded-md text-sm font-medium transition-colors"
             >
-              Add task status
+              Add list
             </Button>
             <Button
               type="button"
-              onClick={() => setIsAddingColumn(false)}
+              onClick={cancelAddingColumn}
               className="p-1.5 !bg-inherit hover:!bg-gray-300 rounded-md transition-colors !shadow-none !px-2 !border-0"
             >
               <X className="w-4 h-4 text-gray-500" />
@@ -374,11 +470,11 @@ export default function KanbanBoard({ projectId }: { projectId: string }) {
         </div>
       ) : (
         <Button
-          onClick={() => setIsAddingColumn(true)}
+          onClick={startAddingColumn}
           className="flex items-center gap-2 p-3 text-gray-600 !bg-gray-50 hover:!bg-gray-300 rounded-lg transition-colors group w-[272px]"
         >
           <Plus className="w-4 h-4" />
-          <span className="text-sm font-medium">Add task status</span>
+          <span className="text-sm font-medium">Add another list</span>
         </Button>
       )}
     </div>

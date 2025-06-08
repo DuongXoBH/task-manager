@@ -28,7 +28,7 @@ export default function UserProfilePopover({
       <PopoverTrigger asChild>
         <Button
           type="button"
-          className="!p-0 !rounded-full hover:bg-gray-200 -ml-1 hover:opacity-80"
+          className="!p-0 !rounded-full hover:bg-gray-200 -ml-1 hover:opacity-80 text-black bg-white dark:text-white   "
           onClick={() => setIsOpen(true)}
         >
           <div className="relative">
@@ -62,7 +62,7 @@ export default function UserProfilePopover({
 
         <div className="px-4 pb-4">
           <div className="relative -mt-8 mb-3">
-            <Avatar className="size-16" isCircle>
+            <Avatar className="size-16 text-black" isCircle>
               <AvatarImage src={user?.avatar} alt={user?.name} />
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
