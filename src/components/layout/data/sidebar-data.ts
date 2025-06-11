@@ -1,6 +1,5 @@
 import {
   AudioWaveform,
-  Book,
   Command,
   GalleryVerticalEnd,
   Home,
@@ -39,11 +38,6 @@ export const sidebarData: SidebarData = {
           title: "Dashboard",
           url: "/dashboard",
           icon: Table,
-        },
-        {
-          title: "Project",
-          url: "/project",
-          icon: Book,
         },
       ],
     },

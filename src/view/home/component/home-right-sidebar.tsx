@@ -1,6 +1,6 @@
 import { Clock } from "lucide-react";
 import ListComponent from "./table-list";
-import CreateProjectDialog from "@/view/project/component/create-projects";
+import CreateProjectDialog from "@/view/project/create-project/create-projects";
 
 export default function HomeRightSidebar() {
   return (

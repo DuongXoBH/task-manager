@@ -15,8 +15,8 @@ import EditTask from "./edit-task-card";
 import { Button } from "@/components/ui/button";
 import { useDeleteTask } from "../../apis/task/use-delete-task";
 import { useAtom } from "jotai";
-import { useTaskListStore } from "@/store/project";
 import { useState } from "react";
+import { useTaskListStore } from "../../store";
 
 interface TaskCardProps {
   task: ITaskResponse;
@@ -71,7 +71,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, columnId }) => {
                   )}
                 >
                   <Clock size={16} />
-                  <span>{format(task?.dueDate, "PPP")}</span>
+                  <span>{format(task?.dueDate ?? undefined, "PPP")}</span>
                 </div>
               )}
             </div>

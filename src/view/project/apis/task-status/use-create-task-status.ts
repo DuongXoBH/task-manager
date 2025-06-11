@@ -12,10 +12,13 @@ const createNewTaskStatus = async (
   return data;
 };
 
-export const useCreateNewTaskStatus = () =>
+export const useCreateNewTaskStatus = (
+  onSuccess: (val: ITaskStatusResponse) => void
+) =>
   useMutation({
     mutationFn: (payload: TCreateTaskStatusPayload) =>
       createNewTaskStatus(payload),
+    onSuccess,
     onError: (error: Error) => {
       const { message } = error;
       toast.error(message);

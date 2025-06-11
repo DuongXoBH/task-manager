@@ -3,12 +3,14 @@ import { useCallback, useState } from "react";
 import Cropper, { type Area } from "react-easy-crop";
 
 interface ImageCropperProps {
+  type: string | undefined;
   imageSrc: string;
   onCropComplete: (croppedAreaPixels: Area) => void;
   showCropper: boolean;
 }
 
 export function ImageCropper({
+  type,
   imageSrc,
   onCropComplete,
   showCropper,
@@ -32,7 +34,7 @@ export function ImageCropper({
           image={imageSrc}
           crop={crop}
           zoom={zoom}
-          aspect={16 / 9}
+          aspect={type === "avatar" ? 1 : 16 / 9}
           onCropChange={setCrop}
           onZoomChange={setZoom}
           onCropComplete={handleCropComplete}

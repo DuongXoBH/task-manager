@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { AxiosError } from "axios";
-import { Loader, Plus } from "lucide-react";
+import { Loader } from "lucide-react";
 import { toast } from "react-toastify";
 import { getCroppedImg } from "@/lib/utils";
 
@@ -17,11 +17,16 @@ import type { Area } from "react-easy-crop";
 import { useUploadImages } from "@/apis/use-upload-images";
 
 interface IImageUpload {
+  type: "avatar" | "image";
   defaultImage?: string;
   setAvatar?: (imageUrl: string) => void;
 }
 
-export default function ImageUpload({ defaultImage, setAvatar }: IImageUpload) {
+export default function ImageUpload({
+  type,
+  defaultImage,
+  setAvatar,
+}: IImageUpload) {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [previewImageUrl, setPreviewImageUrl] = useState<string | undefined>(
     defaultImage
@@ -32,7 +37,7 @@ export default function ImageUpload({ defaultImage, setAvatar }: IImageUpload) {
   const [uploading, setUploading] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { mutateAsync: mutateUploadImage } = useUploadImages();
+  const { mutateAsync: uploadImageMutate } = useUploadImages();
 
   useEffect(() => {
     if (dialogOpen) {
@@ -73,9 +78,7 @@ export default function ImageUpload({ defaultImage, setAvatar }: IImageUpload) {
       const file = new File([croppedImage], "avatar.jpg", {
         type: croppedImage.type,
       });
-      const formData = new FormData();
-      formData.append("image", file);
-      const response = await mutateUploadImage(formData);
+      const response = await uploadImageMutate({ file, type });
 
       if (response.url) {
         setPreviewImageUrl(response.url);
@@ -93,11 +96,7 @@ export default function ImageUpload({ defaultImage, setAvatar }: IImageUpload) {
   };
 
   return (
-    <div className="space-y-4 flex flex-col justify-center">
-      <div className="flex items-center space-x-2">
-        <Plus className="h-5 w-5 text-gray-500" />
-        <span className="font-medium text-gray-900">Add Background Image</span>
-      </div>
+    <div className="flex flex-col justify-center">
       <div
         onClick={() => fileInputRef.current?.click()}
         className="relative flex justify-center items-end "
@@ -131,6 +130,7 @@ export default function ImageUpload({ defaultImage, setAvatar }: IImageUpload) {
           <DialogTitle></DialogTitle>
           {imageSrc && (
             <ImageCropper
+              type={type}
               imageSrc={imageSrc}
               onCropComplete={setCroppedAreaPixels}
               showCropper={showCropper}
@@ -149,8 +149,13 @@ export default function ImageUpload({ defaultImage, setAvatar }: IImageUpload) {
               className="bg-blue-400 hover:bg-blue-500 text-black"
               onClick={handleComplete}
             >
-              {uploading && <Loader className="mr-2 size-4 animate-spin" />}
-              Upload
+              {uploading ? (
+                <>
+                  <Loader className="mr-2 size-4 animate-spin" /> Uploading
+                </>
+              ) : (
+                "Upload"
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

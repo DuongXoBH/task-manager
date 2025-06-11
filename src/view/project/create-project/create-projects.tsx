@@ -18,14 +18,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Inbox, Loader } from "lucide-react";
+import { Inbox, Loader, Plus } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { formSchema, type TCreateProjectForm } from "../types/create-project";
 import { useCreateNewProject } from "../apis/project/use-create-project";
 import { useAtom } from "jotai";
 import { useUserInfoStore } from "@/store/auth";
 import { useQueryClient } from "@tanstack/react-query";
-import AddMemberToProject from "./add-member";
+import AddMemberToProject from "../component/add-member";
 import ImageUpload from "@/components/layout/image-upload";
 import { useState } from "react";
 import { toast } from "react-toastify";
@@ -75,7 +75,7 @@ export default function CreateProjectDialog() {
                 control={form.control}
                 name="name"
                 render={({ field }) => (
-                  <FormItem className="mb-5 w-full">
+                  <FormItem className="w-full">
                     <FormLabel className="text-sm leading-[18px] font-semibold">
                       Name<span className="text-red-600">*</span>
                     </FormLabel>
@@ -90,7 +90,7 @@ export default function CreateProjectDialog() {
                           <Inbox />
                         </div>
                         <Input
-                          placeholder="Enter email address"
+                          placeholder="Enter your project's title"
                           className="h-[50px] pl-16 placeholder:text-[#697698]"
                           {...field}
                         />
@@ -103,9 +103,20 @@ export default function CreateProjectDialog() {
                 )}
               />
               {/* Upload Image */}
-              <ImageUpload
-                setAvatar={(images: string) => form.setValue("images", images)}
-              />
+              <div className="w-full flex flex-col space-y-10">
+                <div className="flex items-center space-x-2">
+                  <Plus className="h-5 w-5 text-gray-500" />
+                  <span className="font-medium text-gray-900">
+                    Add Background Image
+                  </span>
+                </div>
+                <ImageUpload
+                  type="image"
+                  setAvatar={(images: string) =>
+                    form.setValue("images", images)
+                  }
+                />
+              </div>
 
               {/* Add Member to Project */}
               <AddMemberToProject />

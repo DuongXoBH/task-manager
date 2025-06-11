@@ -35,8 +35,8 @@ import { toast } from "react-toastify";
 import { Label } from "@/components/ui/label";
 import TinyEditorComponent from "./description-field";
 import { useAtom } from "jotai";
-import { useTaskListStore } from "@/store/project";
 import { useUserInfoStore } from "@/store/auth";
+import { useTaskListStore } from "../../store";
 interface IEditTaskProps {
   task: ITaskResponse;
   setIsOpen: (status: boolean) => void;
@@ -69,7 +69,7 @@ export default function EditTask({ task, setIsOpen }: IEditTaskProps) {
       createdById: auth?._id ?? "",
       title: val.title ?? task.title,
       description: val.description,
-      dueDate: val.dueDate ? new Date(val.dueDate) : task.dueDate,
+      dueDate: val.dueDate ? new Date(val.dueDate) : null,
       completed: val.completed,
       createdAt: task.createdAt,
       updatedAt: Date.now().toString(),
@@ -87,7 +87,10 @@ export default function EditTask({ task, setIsOpen }: IEditTaskProps) {
       })
     );
     updateTaskMutate.mutate(
-      { taskId: task._id, payload: val },
+      {
+        taskId: task._id,
+        payload: { ...val, dueDate: val.dueDate ? val.dueDate : null },
+      },
       {
         onSuccess: () => {
           toast.success("Success");
@@ -95,6 +98,23 @@ export default function EditTask({ task, setIsOpen }: IEditTaskProps) {
         },
       }
     );
+  };
+
+  const onSelectDate = (date: Date | undefined) => {
+    if (date) {
+      const createdAtDate = new Date(task.createdAt);
+      const isInvalid =
+        date.setHours(0, 0, 0, 0) < createdAtDate.setHours(0, 0, 0, 0);
+      if (isInvalid) {
+        form.setError("dueDate", {
+          type: "manual",
+          message: "Due date must be after the last created date.",
+        });
+      }
+    }
+    form.clearErrors("dueDate");
+    setSelectedDate(date);
+    form.setValue("dueDate", date);
   };
 
   useEffect(() => {
@@ -195,24 +215,7 @@ export default function EditTask({ task, setIsOpen }: IEditTaskProps) {
                           <Calendar
                             mode="single"
                             selected={selectedDate}
-                            onSelect={(date) => {
-                              if (!date) return;
-                              const createdAtDate = new Date(task.createdAt);
-                              const isInvalid =
-                                date.setHours(0, 0, 0, 0) <
-                                createdAtDate.setHours(0, 0, 0, 0);
-                              if (isInvalid) {
-                                form.setError("dueDate", {
-                                  type: "manual",
-                                  message:
-                                    "Due date must be after the last created date.",
-                                });
-                              } else {
-                                form.clearErrors("dueDate");
-                                setSelectedDate(date);
-                                form.setValue("dueDate", date);
-                              }
-                            }}
+                            onSelect={onSelectDate}
                             initialFocus
                           />
                         </PopoverContent>

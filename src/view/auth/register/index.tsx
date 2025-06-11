@@ -2,7 +2,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
-import { Eye, EyeOff, Image, Loader, Lock, Mail, User } from "lucide-react";
+import { Eye, EyeOff, Loader, Lock, Mail, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -273,38 +273,6 @@ export function RegisterForm() {
                       </SelectItem>
                     </SelectContent>
                   </Select>
-                  <div className="h-5">
-                    <FormMessage />
-                  </div>
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="avatar"
-              render={({ field }) => (
-                <FormItem className="mb-5 w-full">
-                  <FormLabel className="text-sm leading-[18px] font-semibold text-white">
-                    Avatar URL <span className="text-gray-400">(Optional)</span>
-                  </FormLabel>
-                  <FormControl>
-                    <div
-                      className={cn(
-                        "relative flex h-[50px] w-full items-center rounded-xs",
-                        form.watch("avatar") ? "text-white" : "text-[#697698]"
-                      )}
-                    >
-                      <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-5">
-                        <Image />
-                      </div>
-                      <Input
-                        placeholder="Enter avatar URL"
-                        className="h-[50px] pl-16 placeholder:text-[#697698]"
-                        {...field}
-                      />
-                    </div>
-                  </FormControl>
                   <div className="h-5">
                     <FormMessage />
                   </div>

@@ -19,7 +19,6 @@ import { Route as AuthenticatedIndexImport } from './routes/_authenticated/index
 import { Route as AuthenticatedDashboardImport } from './routes/_authenticated/dashboard'
 import { Route as authRegisterImport } from './routes/(auth)/register'
 import { Route as authLoginImport } from './routes/(auth)/login'
-import { Route as AuthenticatedProjectIndexImport } from './routes/_authenticated/project/index'
 import { Route as AuthenticatedProjectProjectIdImport } from './routes/_authenticated/project/$projectId'
 
 // Create Virtual Routes
@@ -104,12 +103,6 @@ const authLoginRoute = authLoginImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => authRouteRoute,
-} as any)
-
-const AuthenticatedProjectIndexRoute = AuthenticatedProjectIndexImport.update({
-  id: '/project/',
-  path: '/project/',
-  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 
 const AuthenticatedProjectProjectIdRoute =
@@ -207,13 +200,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProjectProjectIdImport
       parentRoute: typeof AuthenticatedRouteImport
     }
-    '/_authenticated/project/': {
-      id: '/_authenticated/project/'
-      path: '/project'
-      fullPath: '/project'
-      preLoaderRoute: typeof AuthenticatedProjectIndexImport
-      parentRoute: typeof AuthenticatedRouteImport
-    }
   }
 }
 
@@ -237,14 +223,12 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedProjectProjectIdRoute: typeof AuthenticatedProjectProjectIdRoute
-  AuthenticatedProjectIndexRoute: typeof AuthenticatedProjectIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedProjectProjectIdRoute: AuthenticatedProjectProjectIdRoute,
-  AuthenticatedProjectIndexRoute: AuthenticatedProjectIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -262,7 +246,6 @@ export interface FileRoutesByFullPath {
   '/500': typeof errors500LazyRoute
   '/503': typeof errors503LazyRoute
   '/project/$projectId': typeof AuthenticatedProjectProjectIdRoute
-  '/project': typeof AuthenticatedProjectIndexRoute
 }
 
 export interface FileRoutesByTo {
@@ -276,7 +259,6 @@ export interface FileRoutesByTo {
   '/500': typeof errors500LazyRoute
   '/503': typeof errors503LazyRoute
   '/project/$projectId': typeof AuthenticatedProjectProjectIdRoute
-  '/project': typeof AuthenticatedProjectIndexRoute
 }
 
 export interface FileRoutesById {
@@ -293,7 +275,6 @@ export interface FileRoutesById {
   '/(errors)/503': typeof errors503LazyRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/project/$projectId': typeof AuthenticatedProjectProjectIdRoute
-  '/_authenticated/project/': typeof AuthenticatedProjectIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -310,7 +291,6 @@ export interface FileRouteTypes {
     | '/500'
     | '/503'
     | '/project/$projectId'
-    | '/project'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -323,7 +303,6 @@ export interface FileRouteTypes {
     | '/500'
     | '/503'
     | '/project/$projectId'
-    | '/project'
   id:
     | '__root__'
     | '/(auth)'
@@ -338,7 +317,6 @@ export interface FileRouteTypes {
     | '/(errors)/503'
     | '/_authenticated/'
     | '/_authenticated/project/$projectId'
-    | '/_authenticated/project/'
   fileRoutesById: FileRoutesById
 }
 
@@ -393,8 +371,7 @@ export const routeTree = rootRoute
       "children": [
         "/_authenticated/dashboard",
         "/_authenticated/",
-        "/_authenticated/project/$projectId",
-        "/_authenticated/project/"
+        "/_authenticated/project/$projectId"
       ]
     },
     "/(auth)/login": {
@@ -430,10 +407,6 @@ export const routeTree = rootRoute
     },
     "/_authenticated/project/$projectId": {
       "filePath": "_authenticated/project/$projectId.tsx",
-      "parent": "/_authenticated"
-    },
-    "/_authenticated/project/": {
-      "filePath": "_authenticated/project/index.tsx",
       "parent": "/_authenticated"
     }
   }

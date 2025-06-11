@@ -17,7 +17,7 @@ export interface ITaskResponse {
   statusId: string;
   title: string;
   description?: string;
-  dueDate?: Date;
+  dueDate?: Date | null;
   completed?: boolean;
   createdById: string;
   createdAt: string;
@@ -29,4 +29,10 @@ export interface ITaskStatusResponse {
   projectId: string;
   title: string;
   order: string;
+}
+
+export interface IParams {
+  completed?: string;
+  fromDate?: string;
+  toDate?: string;
 }

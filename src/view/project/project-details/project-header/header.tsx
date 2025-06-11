@@ -1,7 +1,7 @@
 import type { IProjectResponse } from "../../types";
 import UserProfilePopover from "./profile-popover";
 import AddMemberDialog from "./add-member-dialog";
-import FilterTask from "./filter-task";
+import FilterTask from "./filter";
 interface IProjectHeaderProps {
   project: IProjectResponse | undefined;
 }
