@@ -4,7 +4,7 @@ import type { IUserResponse } from "@/types";
 import { useAtom } from "jotai";
 import { useUserInfoStore, useUserList } from "@/store/auth";
 import { useFormContext } from "react-hook-form";
-import type { TCreateProjectForm } from "../types/create-project";
+import type { TCreateProjectForm } from "../../project/types/create-project";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 

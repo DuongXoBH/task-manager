@@ -20,12 +20,15 @@ import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Inbox, Loader, Plus } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { formSchema, type TCreateProjectForm } from "../types/create-project";
-import { useCreateNewProject } from "../apis/project/use-create-project";
+import {
+  formSchema,
+  type TCreateProjectForm,
+} from "../../project/types/create-project";
+import { useCreateNewProject } from "../../project/apis/project/use-create-project";
 import { useAtom } from "jotai";
 import { useUserInfoStore } from "@/store/auth";
 import { useQueryClient } from "@tanstack/react-query";
-import AddMemberToProject from "../component/add-member";
+import AddMemberToProject from "./add-member";
 import ImageUpload from "@/components/layout/image-upload";
 import { useState } from "react";
 import { toast } from "react-toastify";
@@ -38,9 +41,9 @@ export default function CreateProjectDialog() {
   const queryClient = useQueryClient();
 
   const onSuccess = () => {
-    queryClient.invalidateQueries({ queryKey: ["getRecentlyProject"] });
-    queryClient.invalidateQueries({ queryKey: ["getGuestProject"] });
-    queryClient.invalidateQueries({ queryKey: ["getProjectByMe"] });
+    queryClient.refetchQueries({ queryKey: ["getRecentlyProject"] });
+    queryClient.refetchQueries({ queryKey: ["getGuestProject"] });
+    queryClient.refetchQueries({ queryKey: ["getProjectByMe"] });
     toast.success("Create project successful");
     setIsOpen(false);
   };

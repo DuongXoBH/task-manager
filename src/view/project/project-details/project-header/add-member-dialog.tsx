@@ -36,18 +36,20 @@ export default function AddMemberDialog({
   const isAuth = auth?._id === project.createdById;
   const [memberList, setMemberList] = useState<string[]>(project.memberIds);
   const [users] = useAtom(useUserList);
+  const [isOpen, setIsOpen] = useState(false);
   const queryClient = useQueryClient();
   const updateProjectMutate = useUpdateProject(() => {
     toast.success("Success");
-    queryClient.invalidateQueries({
+    setIsOpen(false);
+    queryClient.refetchQueries({
       queryKey: ["getProjectById", project._id],
     });
   });
   const filterUsers = useMemo(() => {
     return users?.filter((user) => !memberList.includes(user._id)) ?? [];
-  }, [users, memberList]);
+  }, [users, memberList]).slice(0, 10);
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button
           type="button"

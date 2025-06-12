@@ -36,7 +36,9 @@ export default function AddColumnToProject({
   const addColumn = () => {
     if (!newColumn?.title) return;
     const isDuplicate = columns?.some(
-      (column) => column.title.toLowerCase() === newColumn.title.toLowerCase()
+      (column) =>
+        column.title.toLowerCase().trim() ===
+        newColumn.title.toLowerCase().trim()
     );
 
     if (isDuplicate) {

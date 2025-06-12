@@ -1,17 +1,17 @@
-import { useState } from 'react'
-import EditProfile from './edit-profile'
-import UserProfile from './profile'
-import SheetContentLayout from './sheet-layout'
+import { useState } from "react";
+import EditProfile from "./edit-profile";
+import UserProfile from "./profile";
+import SheetContentLayout from "./sheet-layout";
 
 export default function UserSheet() {
-  const [isEditPage, setIsEditPage] = useState(false)
+  const [isEditPage, setIsEditPage] = useState(false);
   const content = !isEditPage ? (
     <UserProfile setIsEdit={setIsEditPage} />
   ) : (
     <EditProfile />
-  )
+  );
 
-  const title = !isEditPage ? 'user profile' : 'user profile edit'
+  const title = !isEditPage ? "user profile" : "user profile edit";
 
   return (
     <SheetContentLayout
@@ -20,5 +20,5 @@ export default function UserSheet() {
       isEdit={isEditPage}
       setIsEdit={setIsEditPage}
     />
-  )
+  );
 }

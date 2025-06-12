@@ -18,14 +18,14 @@ import "tinymce/plugins/media";
 import "tinymce/plugins/table";
 import "tinymce/plugins/help";
 import "tinymce/plugins/wordcount";
-
-export default function TinyEditorComponent({
-  setContent,
-  placeholder,
-}: {
+interface ITinyEditorComponentProps {
+  initValue: string;
   setContent: (text: string) => void;
-  placeholder?: string;
-}) {
+}
+export default function TinyEditorComponent({
+  initValue,
+  setContent,
+}: ITinyEditorComponentProps) {
   return (
     <Editor
       licenseKey="gpl"
@@ -34,7 +34,7 @@ export default function TinyEditorComponent({
         menubar: false,
         statusbar: false,
         suffix: ".min",
-        placeholder: placeholder || "Write something...",
+        placeholder: "Write something...",
         base_url: "/tinymce",
         plugins: [
           "advlist",
@@ -58,7 +58,7 @@ export default function TinyEditorComponent({
           "bullist numlist outdent indent | removeformat | help",
       }}
       onEditorChange={(content: string) => setContent(content)}
-      initialValue={placeholder}
+      initialValue={initValue}
     />
   );
 }

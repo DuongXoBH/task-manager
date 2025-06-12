@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import type { Area } from "react-easy-crop";
 import { useUploadImages } from "@/apis/use-upload-images";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface IImageUpload {
   type: "avatar" | "image";
@@ -99,14 +100,21 @@ export default function ImageUpload({
     <div className="flex flex-col justify-center">
       <div
         onClick={() => fileInputRef.current?.click()}
-        className="relative flex justify-center items-end "
+        className="relative flex justify-center items-end cursor-pointer"
       >
         {previewImageUrl ? (
-          <img
-            src={previewImageUrl}
-            alt=""
-            className="w-[280px] cursor-pointer"
-          />
+          type === "image" ? (
+            <img
+              src={previewImageUrl}
+              alt=""
+              className="w-[280px] cursor-pointer"
+            />
+          ) : (
+            <Avatar isCircle className="size-[70px]">
+              <AvatarImage src={previewImageUrl} alt="avatar" />
+              <AvatarFallback>CN</AvatarFallback>
+            </Avatar>
+          )
         ) : (
           <Button
             type="button"

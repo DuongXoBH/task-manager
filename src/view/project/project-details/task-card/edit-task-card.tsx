@@ -23,7 +23,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Checkbox } from "@/components/ui/checkbox";
-import { cn, stripHtmlTags } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import {
   Popover,
   PopoverContent,
@@ -110,6 +110,8 @@ export default function EditTask({ task, setIsOpen }: IEditTaskProps) {
           type: "manual",
           message: "Due date must be after the last created date.",
         });
+        toast.error("Due date must be after the last created date.");
+        return;
       }
     }
     form.clearErrors("dueDate");
@@ -250,8 +252,8 @@ export default function EditTask({ task, setIsOpen }: IEditTaskProps) {
                   </div>
                   {isEdit ? (
                     <TinyEditorComponent
+                      initValue={task.description ?? ""}
                       setContent={setDescription}
-                      placeholder={stripHtmlTags(task.description ?? "")}
                     />
                   ) : (
                     <div

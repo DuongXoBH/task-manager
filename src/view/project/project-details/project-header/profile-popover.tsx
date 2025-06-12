@@ -34,7 +34,9 @@ export default function UserProfilePopover({
           <div className="relative">
             <Avatar isCircle className="w-8 h-8">
               <AvatarImage src={user?.avatar} alt={user?.name} />
-              <AvatarFallback className="text-xs">CN</AvatarFallback>
+              <AvatarFallback className="text-xs border border-red-900 rounded-full">
+                CN
+              </AvatarFallback>
             </Avatar>
             {createdById === user?._id && (
               <div className="absolute -bottom-2.5 -right-1 rounded-full p-0.5 bg-black">

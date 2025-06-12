@@ -45,7 +45,7 @@ export const useGetTaskByProjectId = (projectId: string) => {
     if (filters?.toDate) {
       params.append("toDate", filters.toDate.toISOString());
     }
-    queryClient.invalidateQueries({
+    queryClient.refetchQueries({
       queryKey: ["getTaskStatus", projectId],
     });
     return params;

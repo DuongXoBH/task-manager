@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { useGetProjectById } from "../apis/project/use-get-project-by-id";
 import Header from "@/components/layout/header";
-import ProjectHeader from "./project-header/header";
+import ProjectHeader from "./project-header";
 
 export default function ProjectDetailsLayout({
   children,

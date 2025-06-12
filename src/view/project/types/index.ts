@@ -6,7 +6,7 @@ export interface IProjectResponse {
   memberIds: string[];
   taskStatusIds: string[];
   taskIds: string[];
-  recentlyAccessedAt?: string;
+  recentlyAccessedAt: string;
   createdAt?: string;
   updatedAt?: string;
 }

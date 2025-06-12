@@ -10,8 +10,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useLogout } from "@/hooks/use-logout";
 import type { IUserResponse } from "@/types";
-import { Link } from "@tanstack/react-router";
-import { BadgeCheck, LogOut } from "lucide-react";
+import UserSheet from "@/view/user-profile";
+import { LogOut } from "lucide-react";
 
 export function HeadUser({ user }: { user?: IUserResponse }) {
   return (
@@ -42,10 +42,7 @@ export function HeadUser({ user }: { user?: IUserResponse }) {
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
-            <Link to="/">
-              <BadgeCheck />
-              Account
-            </Link>
+            <UserSheet />
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />

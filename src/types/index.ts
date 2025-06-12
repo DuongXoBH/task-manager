@@ -13,3 +13,8 @@ export interface ILoginResponse {
   user: IUserResponse;
   message: string;
 }
+
+export interface IUpdateResponse {
+  data: IUserResponse;
+  status: string;
+}

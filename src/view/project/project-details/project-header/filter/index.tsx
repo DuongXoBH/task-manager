@@ -39,7 +39,7 @@ export default function FilterTask() {
               bg-gray-800 text-white text-sm rounded px-3 py-1 whitespace-nowrap z-10"
             >
               Filter by{" "}
-              <span className="px-2 py-0.5 bg-white text-gray-800 rounded-">
+              <span className="px-2 py-0.5 bg-white text-gray-800 rounded-xs">
                 F
               </span>
             </div>

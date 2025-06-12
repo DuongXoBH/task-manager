@@ -28,7 +28,7 @@ api.interceptors.response.use(
         store.set(useAuthRefreshToken, "");
         router.navigate({ to: "/login" });
         if (!toast.isActive(toastId)) {
-          toast.error("Your session has expired, please log in again.", {
+          toast.error("Your session has expired, please Login again.", {
             toastId,
           });
         }

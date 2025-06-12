@@ -12,10 +12,10 @@ export default function UserProfile({
 }) {
   const [userInfo] = useAtom(useUserInfoStore);
   return (
-    <div className="relative flex w-full flex-col space-y-5 pr-[50px] pl-10">
+    <div className="relative flex w-full flex-col space-y-5 px-12">
       <div className="w-full flex-row justify-between">
         <div className="flex items-center gap-[13px]">
-          <Avatar className="size-[70px]">
+          <Avatar isCircle className="size-[70px]">
             <AvatarImage
               src={userInfo?.avatar || "/api/placeholder/40/40"}
               alt={userInfo?.name}
@@ -46,9 +46,24 @@ export default function UserProfile({
       </div>
       <Separator />
       <div className="w-full max-w-md">
-        <span className="mb-5 px-1 text-[15px] font-bold text-slate-800">
+        <span className="text-[15px] font-bold text-slate-800">
           Personal Info
         </span>
+        <div className="mt-[7px] space-y-[15px]">
+          <div className="flex items-center justify-between space-x-[10px] rounded-[5px] border-1 border-gray-300 bg-gray-100 px-[6px] py-1.5">
+            <div className="flex-shrink-0">
+              <div className="bg-[#0D99FF] rounded-sm p-[10px]">
+                <Icons.role />
+              </div>
+            </div>
+            <div className="flex w-full flex-col">
+              <span className="text-xs font-medium text-slate-500">Role</span>
+              <span className="mt-0.5 text-sm font-semibold capitalize">
+                {userInfo ? userInfo.role.replace("_", " ") : ""}
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

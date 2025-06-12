@@ -1,5 +1,4 @@
-import { Link } from "@tanstack/react-router";
-import { BadgeCheck, ChevronsUpDown, LogOut } from "lucide-react";
+import { ChevronsUpDown, LogOut } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -18,6 +17,7 @@ import {
 } from "@/components/ui/sidebar";
 import type { IUserResponse } from "@/types";
 import { useLogout } from "@/hooks/use-logout";
+import UserSheet from "@/view/user-profile";
 interface INavUserProps {
   user?: IUserResponse;
   hasInfo?: boolean;
@@ -68,16 +68,13 @@ export function NavUser({ user, hasInfo }: INavUserProps) {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem asChild>
-                <Link to="/">
-                  <BadgeCheck />
-                  Account
-                </Link>
+                <UserSheet />
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={useLogout()}>
               <LogOut />
-              Log out
+              <span>Logout</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
