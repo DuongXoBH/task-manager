@@ -20,10 +20,10 @@ import {
 } from "@/components/ui/dialog";
 import { Loader, Plus, UserPlus, X } from "lucide-react";
 import { useMemo, useState } from "react";
-import { useUpdateProject } from "../../apis/project/use-update-project";
+import { useUpdateProject } from "../../../apis/project/use-update-project";
 import { toast } from "react-toastify";
 import { useQueryClient } from "@tanstack/react-query";
-import type { IProjectResponse } from "../../types";
+import type { IProjectResponse } from "../../../types";
 import { useAtom } from "jotai";
 import { useUserInfoStore, useUserList } from "@/store/auth";
 

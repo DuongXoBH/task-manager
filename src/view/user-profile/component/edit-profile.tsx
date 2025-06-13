@@ -5,9 +5,9 @@ import {
   editFormSchema,
   type TUpdateForm,
   type TUpdateMePayload,
-} from "./types/edit-profile";
+} from "../types/edit-profile";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useUpdateMe } from "./apis/use-update-me";
+import { useUpdateMe } from "../apis/use-update-me";
 import {
   Form,
   FormControl,
@@ -26,8 +26,13 @@ import { Eye, EyeOff, Loader } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 
-export default function EditProfile() {
+export default function EditProfile({
+  setIsEdit,
+}: {
+  setIsEdit: (open: boolean) => void;
+}) {
   const [userInfo] = useAtom(useUserInfoStore);
+  const [isDisable, setIsDisable] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const queryClient = useQueryClient();
@@ -35,6 +40,7 @@ export default function EditProfile() {
     queryClient.refetchQueries({ queryKey: ["getMe"] });
     queryClient.refetchQueries({ queryKey: ["getUsers"] });
     queryClient.refetchQueries({ queryKey: ["getUserById"] });
+    setIsEdit(false);
     toast.success("Update successful");
   };
   const updateMeMutation = useUpdateMe(onSuccess);
@@ -59,6 +65,7 @@ export default function EditProfile() {
     <div className=" flex w-full flex-col space-y-5 px-12">
       <Form {...form}>
         <form
+          onChange={() => setIsDisable(false)}
           onSubmit={form.handleSubmit(onSubmit)}
           className="flex w-full flex-col items-center gap-4"
         >
@@ -224,6 +231,7 @@ export default function EditProfile() {
 
           <Button
             type="submit"
+            disabled={isDisable}
             variant={"secondary"}
             className="bg-blue-500 mt-[30px] h-[50px] w-full rounded-[5px] text-sm font-bold text-gray-100 hover:bg-blue-600 hover:text-white"
           >
