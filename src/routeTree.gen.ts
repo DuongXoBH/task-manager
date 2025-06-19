@@ -16,9 +16,9 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated/route'
 import { Route as authRouteImport } from './routes/(auth)/route'
 import { Route as AuthenticatedIndexImport } from './routes/_authenticated/index'
-import { Route as AuthenticatedDashboardImport } from './routes/_authenticated/dashboard'
 import { Route as authRegisterImport } from './routes/(auth)/register'
 import { Route as authLoginImport } from './routes/(auth)/login'
+import { Route as AuthenticatedProjectIndexImport } from './routes/_authenticated/project/index'
 import { Route as AuthenticatedProjectProjectIdImport } from './routes/_authenticated/project/$projectId'
 
 // Create Virtual Routes
@@ -87,12 +87,6 @@ const errors401LazyRoute = errors401LazyImport
   } as any)
   .lazy(() => import('./routes/(errors)/401.lazy').then((d) => d.Route))
 
-const AuthenticatedDashboardRoute = AuthenticatedDashboardImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-
 const authRegisterRoute = authRegisterImport.update({
   id: '/register',
   path: '/register',
@@ -103,6 +97,12 @@ const authLoginRoute = authLoginImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => authRouteRoute,
+} as any)
+
+const AuthenticatedProjectIndexRoute = AuthenticatedProjectIndexImport.update({
+  id: '/project/',
+  path: '/project/',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 
 const AuthenticatedProjectProjectIdRoute =
@@ -143,13 +143,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/register'
       preLoaderRoute: typeof authRegisterImport
       parentRoute: typeof authRouteImport
-    }
-    '/_authenticated/dashboard': {
-      id: '/_authenticated/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof AuthenticatedDashboardImport
-      parentRoute: typeof AuthenticatedRouteImport
     }
     '/(errors)/401': {
       id: '/(errors)/401'
@@ -200,6 +193,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProjectProjectIdImport
       parentRoute: typeof AuthenticatedRouteImport
     }
+    '/_authenticated/project/': {
+      id: '/_authenticated/project/'
+      path: '/project'
+      fullPath: '/project'
+      preLoaderRoute: typeof AuthenticatedProjectIndexImport
+      parentRoute: typeof AuthenticatedRouteImport
+    }
   }
 }
 
@@ -220,15 +220,15 @@ const authRouteRouteWithChildren = authRouteRoute._addFileChildren(
 )
 
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedProjectProjectIdRoute: typeof AuthenticatedProjectProjectIdRoute
+  AuthenticatedProjectIndexRoute: typeof AuthenticatedProjectIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedProjectProjectIdRoute: AuthenticatedProjectProjectIdRoute,
+  AuthenticatedProjectIndexRoute: AuthenticatedProjectIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -239,26 +239,26 @@ export interface FileRoutesByFullPath {
   '': typeof AuthenticatedRouteRouteWithChildren
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
-  '/dashboard': typeof AuthenticatedDashboardRoute
   '/401': typeof errors401LazyRoute
   '/403': typeof errors403LazyRoute
   '/404': typeof errors404LazyRoute
   '/500': typeof errors500LazyRoute
   '/503': typeof errors503LazyRoute
   '/project/$projectId': typeof AuthenticatedProjectProjectIdRoute
+  '/project': typeof AuthenticatedProjectIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof AuthenticatedIndexRoute
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
-  '/dashboard': typeof AuthenticatedDashboardRoute
   '/401': typeof errors401LazyRoute
   '/403': typeof errors403LazyRoute
   '/404': typeof errors404LazyRoute
   '/500': typeof errors500LazyRoute
   '/503': typeof errors503LazyRoute
   '/project/$projectId': typeof AuthenticatedProjectProjectIdRoute
+  '/project': typeof AuthenticatedProjectIndexRoute
 }
 
 export interface FileRoutesById {
@@ -267,7 +267,6 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/(auth)/login': typeof authLoginRoute
   '/(auth)/register': typeof authRegisterRoute
-  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/(errors)/401': typeof errors401LazyRoute
   '/(errors)/403': typeof errors403LazyRoute
   '/(errors)/404': typeof errors404LazyRoute
@@ -275,6 +274,7 @@ export interface FileRoutesById {
   '/(errors)/503': typeof errors503LazyRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/project/$projectId': typeof AuthenticatedProjectProjectIdRoute
+  '/_authenticated/project/': typeof AuthenticatedProjectIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -284,32 +284,31 @@ export interface FileRouteTypes {
     | ''
     | '/login'
     | '/register'
-    | '/dashboard'
     | '/401'
     | '/403'
     | '/404'
     | '/500'
     | '/503'
     | '/project/$projectId'
+    | '/project'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/login'
     | '/register'
-    | '/dashboard'
     | '/401'
     | '/403'
     | '/404'
     | '/500'
     | '/503'
     | '/project/$projectId'
+    | '/project'
   id:
     | '__root__'
     | '/(auth)'
     | '/_authenticated'
     | '/(auth)/login'
     | '/(auth)/register'
-    | '/_authenticated/dashboard'
     | '/(errors)/401'
     | '/(errors)/403'
     | '/(errors)/404'
@@ -317,6 +316,7 @@ export interface FileRouteTypes {
     | '/(errors)/503'
     | '/_authenticated/'
     | '/_authenticated/project/$projectId'
+    | '/_authenticated/project/'
   fileRoutesById: FileRoutesById
 }
 
@@ -369,9 +369,9 @@ export const routeTree = rootRoute
     "/_authenticated": {
       "filePath": "_authenticated/route.tsx",
       "children": [
-        "/_authenticated/dashboard",
         "/_authenticated/",
-        "/_authenticated/project/$projectId"
+        "/_authenticated/project/$projectId",
+        "/_authenticated/project/"
       ]
     },
     "/(auth)/login": {
@@ -381,10 +381,6 @@ export const routeTree = rootRoute
     "/(auth)/register": {
       "filePath": "(auth)/register.tsx",
       "parent": "/(auth)"
-    },
-    "/_authenticated/dashboard": {
-      "filePath": "_authenticated/dashboard.tsx",
-      "parent": "/_authenticated"
     },
     "/(errors)/401": {
       "filePath": "(errors)/401.lazy.tsx"
@@ -407,6 +403,10 @@ export const routeTree = rootRoute
     },
     "/_authenticated/project/$projectId": {
       "filePath": "_authenticated/project/$projectId.tsx",
+      "parent": "/_authenticated"
+    },
+    "/_authenticated/project/": {
+      "filePath": "_authenticated/project/index.tsx",
       "parent": "/_authenticated"
     }
   }

@@ -37,22 +37,26 @@ export default function Search() {
         onClick={() => setOpen(!open)}
       >
         <div className="pointer-events-none absolute inset-y-5 left-10 flex items-center -translate-y-0.5">
-          <SearchIcon className="text-black" />
+          <SearchIcon className="text-gray-600" />
         </div>
         <Input
           disabled
           placeholder="Search project"
-          className="h-10 pl-12 border !border-gray-500 placeholder:!text-gray-800"
+          className="h-10 pl-12 border !border-gray-500 placeholder:!text-gray-800 relative"
         />
-        <span className="px-2 py-0.5 bg-white text-gray-800 border border-gray-500 rounded-xs -translate-x-[100px]">
+        <span className="px-2 py-0.5 bg-white text-gray-600 border border-gray-500 rounded-xs absolute right-18">
           Ctrl
         </span>
-        <span className="px-2 py-0.5 bg-white text-gray-800 border border-gray-500 rounded-xs -translate-x-[100px]">
-          F
+        <span className="px-2 py-0.5 bg-white text-gray-600 border border-gray-500 rounded-xs absolute right-10">
+          K
         </span>
       </Button>
-      <CommandDialog open={open} onOpenChange={setOpen}>
-        <CommandInput placeholder="Type a command or search..." />
+      <CommandDialog
+        open={open}
+        onOpenChange={setOpen}
+        className="!max-w-xl w-full"
+      >
+        <CommandInput placeholder="Search by project's name" />
         <CommandList>
           <CommandEmpty>No results found.</CommandEmpty>
           <CommandGroup heading="My Projects">
@@ -61,8 +65,14 @@ export default function Search() {
                 <Link
                   to="/project/$projectId"
                   params={{ projectId: project._id }}
+                  className="w-full flex flex-col"
                 >
-                  {project.name}
+                  <span className="w-full text-sm font-medium">
+                    {project.name}
+                  </span>
+                  <span className="w-full text-xs font-normal">
+                    {project.createdById}
+                  </span>
                 </Link>
               </CommandItem>
             ))}
@@ -74,8 +84,14 @@ export default function Search() {
                 <Link
                   to="/project/$projectId"
                   params={{ projectId: project._id }}
+                  className="w-full flex flex-col"
                 >
-                  {project.name}
+                  <span className="w-full text-sm font-medium">
+                    {project.name}
+                  </span>
+                  <span className="w-full text-xs font-normal">
+                    {project.createdById}
+                  </span>
                 </Link>
               </CommandItem>
             ))}
